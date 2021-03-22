@@ -18,6 +18,10 @@ allprojects {
         jcenter()
         mavenLocal()
         mavenCentral()
+
+        maven {
+            url 'http://artifacts.sunshower.cloud/repository/sunshower-releases'
+        }
     }
 
 
