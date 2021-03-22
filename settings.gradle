@@ -1,0 +1,4 @@
+include(
+        'docgen-api',
+        'docgen-javadoc'
+)
