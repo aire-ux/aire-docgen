@@ -2,7 +2,6 @@ package com.aire.ux.docgen;
 
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Stack;
@@ -24,13 +23,17 @@ public class AireDocumentationManager {
   }
 
 
+  public static DocumentationContext parse(final Collection<JavaFileObject> paths) {
+    return parse(new PrintWriter(System.out), paths);
+  }
+
   public static DocumentationContext parse(final Writer writer,
       final Collection<JavaFileObject> paths) {
-
+    AireDoclet.setFiles(paths);
     val tool =
         ToolProvider.getSystemDocumentationTool()
             .getTask(
-                new PrintWriter(System.out),
+                writer,
                 null,
                 null,
                 AireDoclet.class,
@@ -41,6 +44,7 @@ public class AireDocumentationManager {
     if (current == null) {
       throw new IllegalStateException("Error: documentation context didn't exist for some reason");
     }
+    AireDoclet.clearFiles();
     return current;
   }
 

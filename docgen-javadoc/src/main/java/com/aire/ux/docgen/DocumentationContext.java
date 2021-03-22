@@ -1,18 +1,25 @@
 package com.aire.ux.docgen;
 
 import com.aire.ux.docgen.model.DocumentationSet;
-import java.nio.file.Path;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import javax.tools.JavaFileObject;
+import lombok.Getter;
 
 public class DocumentationContext {
 
-  private final Set<Path> paths;
+  @Getter
+  private final Set<JavaFileObject> sources;
+  @Getter
   private final DocumentationSet documentationSet;
 
-  public DocumentationContext() {
-    paths = new LinkedHashSet<>();
-    documentationSet = new DocumentationSet();
+  public DocumentationContext(Collection<? extends JavaFileObject> sources) {
+    this.sources = new LinkedHashSet<>(sources);
+    this.documentationSet = new DocumentationSet();
   }
+
+
+
 
 }
