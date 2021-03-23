@@ -7,21 +7,15 @@ import java.io.PrintWriter;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 
-class AireDocletTest {
+public class AireComponentElementParserTest {
+
 
   @Test
-  void ensureInvokingJavadocOnSampleSimpleClassProducesNonNullDocumentationContext() {
-    val result = AireDocumentationManager.parse(new PrintWriter(System.out),
-        loadFromClassPath("airedocs/airedocs/TestClass2.java"));
-    assertNotNull(result);
-  }
-
-  @Test
-  void ensureResultingDocumentationContextHasCorrectPaths() {
+  void ensureElementParserExtractsElementClass() {
     val objs = loadFromClassPath("airedocs/airedocs/TestClass2.java");
     val result = AireDocumentationManager.parse(new PrintWriter(System.out), objs);
+
     assertNotNull(result);
-    assertNotNull(result.getSyntaxTree());
   }
 
 

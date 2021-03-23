@@ -26,6 +26,12 @@
 
       <dependency>
         <groupId>io.sunshower.arcus</groupId>
+        <artifactId>arcus-lang</artifactId>
+        <version>1.0.2.Final</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.sunshower.arcus</groupId>
         <artifactId>arcus-lambda</artifactId>
         <version>1.0.2.Final</version>
       </dependency>

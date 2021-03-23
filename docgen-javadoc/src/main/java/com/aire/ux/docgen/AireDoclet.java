@@ -25,7 +25,7 @@ public class AireDoclet implements Doclet {
 
   private Locale locale;
   private Reporter reporter;
-  private DocumentationContext context;
+  private ProcessingContext context;
 
   public AireDoclet() {
 
@@ -65,9 +65,10 @@ public class AireDoclet implements Doclet {
     log.info("Completed initializing AireDoclet");
   }
 
-  private DocumentationContext createContext() {
-    return new DocumentationContext(files.get());
+  private ProcessingContext createContext() {
+    return new ProcessingContext(locale, reporter);
   }
+
 
   @Override
   public String getName() {
@@ -88,9 +89,10 @@ public class AireDoclet implements Doclet {
   public boolean run(DocletEnvironment environment) {
     log.info("Running AireDoclet with DocletEnvironment: {}", environment);
     val docTrees = environment.getDocTrees();
-    val writer = new BaseAireElementWriter(docTrees, environment, reporter);
+    val parser = new DocumentationParser(docTrees, environment, reporter);
     val elements = environment.getIncludedElements();
-    writer.process(elements);
+    val syntaxTree = parser.process(elements);
+    context.setSyntaxTree(syntaxTree);
     AireDocumentationManager.popContext(context);
     return true;
   }

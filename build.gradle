@@ -51,6 +51,9 @@ subprojects {
         }
     }
 
+    java {
+        modularity.inferModulePath = true
+    }
 
     spotbugsTest {
         enabled = false
