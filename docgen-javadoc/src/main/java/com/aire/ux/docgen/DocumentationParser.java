@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import javax.lang.model.util.ElementScanner9;
-import javax.tools.JavaFileObject;
 import jdk.javadoc.doclet.DocletEnvironment;
 import jdk.javadoc.doclet.Reporter;
 import lombok.val;
@@ -32,10 +31,7 @@ public class DocumentationParser extends ElementScanner9<Void, Integer> {
   private final DocletEnvironment environment;
   private final Map<Kind, Parser> parserCache;
 
-  public DocumentationParser(
-      DocTrees docTrees,
-      DocletEnvironment environment,
-      Reporter reporter) {
+  public DocumentationParser(DocTrees docTrees, DocletEnvironment environment, Reporter reporter) {
     this.reporter = reporter;
     this.environment = environment;
     this.documentForest = docTrees;
@@ -75,5 +71,4 @@ public class DocumentationParser extends ElementScanner9<Void, Integer> {
     }
     return null;
   }
-
 }

@@ -11,7 +11,8 @@ import javax.tools.JavaFileObject.Kind;
 public class DocletTests {
 
   public static Collection<JavaFileObject> loadFromClassPath(String... paths) {
-    return Arrays.stream(paths).map(ClassLoader::getSystemResource)
+    return Arrays.stream(paths)
+        .map(ClassLoader::getSystemResource)
         .flatMap(t -> Exceptions.fromExceptional(t, URL::toURI).stream())
         .map(t -> Exceptions.fromExceptional(t, u -> new AireJavaFileObject(t, Kind.SOURCE)))
         .flatMap(Collection::stream)

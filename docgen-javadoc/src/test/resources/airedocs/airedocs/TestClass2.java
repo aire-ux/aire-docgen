@@ -2,7 +2,10 @@ package airedocs;
 
 
 /**
- * @component io.aire.ux.Button
+ * @component
+ * @name Button
+ *
+ * *this is some* textual _content_
  *
  * @article Documentation
  *

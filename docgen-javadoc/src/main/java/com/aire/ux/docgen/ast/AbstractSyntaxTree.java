@@ -5,11 +5,9 @@ import lombok.Getter;
 
 public class AbstractSyntaxTree {
 
-  @Getter
-  private final SyntaxNode root;
+  @Getter private final SyntaxNode root;
 
-  @Getter
-  private final Context context;
+  @Getter private final Context context;
 
   public AbstractSyntaxTree(SyntaxNode root, Context context) {
     this.root = root;

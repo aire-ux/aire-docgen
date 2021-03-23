@@ -8,5 +8,4 @@ public interface Parser {
   boolean appliesTo(DocTree docTree);
 
   AbstractSyntaxTree parse(Context context);
-
 }

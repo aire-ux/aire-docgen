@@ -27,9 +27,7 @@ public class AireDoclet implements Doclet {
   private Reporter reporter;
   private ProcessingContext context;
 
-  public AireDoclet() {
-
-  }
+  public AireDoclet() {}
 
   public static void setFiles(Collection<JavaFileObject> files) {
     synchronized (filesLock) {
@@ -68,7 +66,6 @@ public class AireDoclet implements Doclet {
   private ProcessingContext createContext() {
     return new ProcessingContext(locale, reporter);
   }
-
 
   @Override
   public String getName() {

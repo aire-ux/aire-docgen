@@ -1,6 +1,5 @@
 package com.aire.ux.docgen;
 
-import com.aire.ux.docgen.ast.AbstractSyntaxTree;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Collection;
@@ -20,35 +19,23 @@ public class AireDocumentationManager {
   private static final ThreadLocal<ProcessingContext> processingContext;
   private static final ThreadLocal<Stack<ProcessingContext>> pendingContexts;
 
-
   static {
     pendingContexts = new ThreadLocal<>();
     pendingContexts.set(new Stack<>());
     processingContext = new ThreadLocal<>();
   }
 
-
-
-
-
-
   public static ProcessingContext parse(final Collection<JavaFileObject> paths) {
     return parse(new PrintWriter(System.out), paths);
   }
 
-  public static ProcessingContext parse(final Writer writer,
-      final Collection<JavaFileObject> paths) {
+  public static ProcessingContext parse(
+      final Writer writer, final Collection<JavaFileObject> paths) {
     reload();
     AireDoclet.setFiles(paths);
     val tool =
         ToolProvider.getSystemDocumentationTool()
-            .getTask(
-                writer,
-                null,
-                null,
-                AireDoclet.class,
-                null,
-                paths);
+            .getTask(writer, null, null, AireDoclet.class, null, paths);
     tool.call();
     val current = processingContext.get();
     if (current == null) {
@@ -57,7 +44,6 @@ public class AireDocumentationManager {
     AireDoclet.clearFiles();
     return current;
   }
-
 
   static void popContext(ProcessingContext context) {
     val ctx = pendingContexts.get().pop();
@@ -76,7 +62,7 @@ public class AireDocumentationManager {
   private static void reload() {
     log.info("Loading component parsers...");
     val serviceLoader = ServiceLoader.load(Parser.class);
-    for(val service : serviceLoader) {
+    for (val service : serviceLoader) {
       DocumentationParser.register(service);
     }
     log.info("Successfully loaded component parsers");

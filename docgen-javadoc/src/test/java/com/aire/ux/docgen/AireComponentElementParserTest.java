@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 public class AireComponentElementParserTest {
 
-
   @Test
   void ensureElementParserExtractsElementClass() {
     val objs = loadFromClassPath("airedocs/airedocs/TestClass2.java");
@@ -17,6 +16,4 @@ public class AireComponentElementParserTest {
 
     assertNotNull(result);
   }
-
-
 }

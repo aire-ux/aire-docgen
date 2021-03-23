@@ -11,8 +11,9 @@ class AireDocletTest {
 
   @Test
   void ensureInvokingJavadocOnSampleSimpleClassProducesNonNullDocumentationContext() {
-    val result = AireDocumentationManager.parse(new PrintWriter(System.out),
-        loadFromClassPath("airedocs/airedocs/TestClass2.java"));
+    val result =
+        AireDocumentationManager.parse(
+            new PrintWriter(System.out), loadFromClassPath("airedocs/airedocs/TestClass2.java"));
     assertNotNull(result);
   }
 
@@ -23,6 +24,4 @@ class AireDocletTest {
     assertNotNull(result);
     assertNotNull(result.getSyntaxTree());
   }
-
-
 }
