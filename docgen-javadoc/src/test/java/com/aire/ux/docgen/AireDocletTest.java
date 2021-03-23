@@ -31,6 +31,15 @@ class AireDocletTest {
     assertEquals(objs.iterator().next(), result.getSources().iterator().next());
   }
 
+  @Test
+  void ensureResultingDocumentationContextHasMultipleElements() {
+    val objs = loadFromClassPath("airedocs/airedocs/SampleSimpleClass.java",
+        "airedocs/airedocs/TestClass2.java");
+    val result = AireDocumentationManager.parse(new PrintWriter(System.out), objs);
+    assertEquals(2, result.getSources().size());
+    assertEquals(objs.iterator().next(), result.getSources().iterator().next());
+  }
+
   private Collection<JavaFileObject> loadFromClassPath(String... paths) {
     return Arrays.stream(paths).map(ClassLoader::getSystemResource)
         .flatMap(t -> Exceptions.fromExceptional(t, URL::toURI).stream())
