@@ -10,6 +10,7 @@ import com.sun.source.doctree.StartElementTree;
 import com.sun.source.doctree.TextTree;
 import com.sun.source.doctree.UnknownBlockTagTree;
 import com.sun.source.util.SimpleDocTreeVisitor;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +78,6 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
 
   @Override
   public List<SyntaxNode> visitEndElement(EndElementTree node, Set<DocTree> unused) {
-
     if (!nodes.isEmpty()) {
       val result = nodes.pop();
       unused.add(node);
@@ -88,6 +88,13 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
 
   @Override
   public List<SyntaxNode> visitUnknownBlockTag(UnknownBlockTagTree node, Set<DocTree> unused) {
-    return super.visit(node.getContent(), unused);
+    val result = new ArrayList<SyntaxNode>();
+    for(val c : node.getContent()) {
+      val cr = super.visit(c, unused);
+      if(cr != null) {
+        result.addAll(cr);
+      }
+    }
+    return result;
   }
 }

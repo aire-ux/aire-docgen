@@ -3,7 +3,6 @@ package com.aire.ux.docgen;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.aire.ux.docgen.ast.NamedSyntaxNode;
 import com.aire.ux.docgen.parsers.ComponentElementParser;
@@ -94,8 +93,36 @@ public class AireDocletTest {
         }
         """;
     val result = parse("Component", type);
-    val node = result.getSyntaxTree().getRoot().getChildren().get(0);
-    System.out.println(result.getSyntaxTree());
-//    assertTrue(node.hasChildren());
+    val nodes = result.findAll(node -> node.getSymbol() == ComponentElementParser.CodeElement);
+    assertEquals(nodes.size(), 1);
+    val codeNode = (NamedSyntaxNode) nodes.get(0);
+    assertEquals(codeNode.getName(), "java");
+  }
+
+  @Test
+  void ensureExtractingMultipleCodeBlocksWorks() {
+    @Language("JAVA") val type = """
+        /**
+        * @component 
+        * this is just some content
+        * <code lang="java">
+        *   public void sayHello() {
+        *   }
+        * </code>
+        * <code lang="groovy">
+        *   public void sayHello() {
+        *   }
+        * </code>
+        */
+        public class Component {
+        }
+        """;
+    val result = parse("Component", type);
+    val nodes = result.findAll(node -> node.getSymbol() == ComponentElementParser.CodeElement);
+    assertEquals(nodes.size(), 2);
+    var codeNode = (NamedSyntaxNode) nodes.get(0);
+    assertEquals("java", codeNode.getName());
+    codeNode = (NamedSyntaxNode)  nodes.get(1);
+    assertEquals("groovy", codeNode.getName());
   }
 }
