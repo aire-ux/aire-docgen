@@ -35,9 +35,13 @@ public class AbstractSyntaxTree {
   private void toString(SyntaxNode node, PrintStream out, String indent,
       boolean last) {
 
-    out.println(indent + (last ? "└╴ ": "├╴") + node.toString());
+    if(node == root) {
+      out.println(node);
+    } else {
+      out.println(indent + (last ? "└╴ " : "├╴") + node.toString());
+    }
 
-    indent = indent + (last ? "  " : "│  ");
+    indent = indent + (last ? "   " : "│  ");
     val iter = node.getChildren().iterator();
     while (iter.hasNext()) {
       val child = iter.next();
