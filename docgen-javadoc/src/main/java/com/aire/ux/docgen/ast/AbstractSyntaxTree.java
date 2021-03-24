@@ -1,6 +1,5 @@
 package com.aire.ux.docgen.ast;
 
-import com.aire.ux.docgen.Context;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -9,15 +8,21 @@ import lombok.val;
 
 public class AbstractSyntaxTree {
 
+  static final Symbol ROOT_SYMBOL = new Symbol() {
+
+    public String toString() {
+      return "RootSymbol";
+    }
+  };
   @Getter
   private final SyntaxNode root;
 
-  @Getter
-  private final Context context;
-
-  public AbstractSyntaxTree(SyntaxNode root, Context context) {
+  public AbstractSyntaxTree(SyntaxNode root) {
     this.root = root;
-    this.context = context;
+  }
+
+  public AbstractSyntaxTree() {
+    this(new RootSyntaxNode());
   }
 
   public String toString() {
@@ -31,11 +36,10 @@ public class AbstractSyntaxTree {
     return os.toString(StandardCharsets.UTF_8);
   }
 
-
   private void toString(SyntaxNode node, PrintStream out, String indent,
       boolean last) {
 
-    if(node == root) {
+    if (node == root) {
       out.println(node);
     } else {
       out.println(indent + (last ? "└╴ " : "├╴") + node.toString());
@@ -47,6 +51,17 @@ public class AbstractSyntaxTree {
       val child = iter.next();
       val isLast = !iter.hasNext();
       toString(child, out, indent, isLast);
+    }
+  }
+
+  static final class RootSyntaxNode extends AbstractSyntaxNode {
+
+    public RootSyntaxNode() {
+      super(ROOT_SYMBOL, null, null, null);
+    }
+
+    public String toString() {
+      return "RootNode";
     }
   }
 }

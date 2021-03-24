@@ -1,5 +1,6 @@
 dependencies {
 
+    implementation 'io.timeandspace:smoothie-map'
     implementation 'io.sunshower.arcus:arcus-log'
     implementation 'io.sunshower.arcus:arcus-lang'
     implementation 'io.sunshower.arcus:arcus-lambda'

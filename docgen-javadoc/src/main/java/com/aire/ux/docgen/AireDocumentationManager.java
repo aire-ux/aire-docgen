@@ -2,11 +2,16 @@ package com.aire.ux.docgen;
 
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Stack;
+import java.util.stream.Collectors;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
@@ -38,7 +43,8 @@ public class AireDocumentationManager {
     AireDoclet.setFiles(paths);
     val tool =
         ToolProvider.getSystemDocumentationTool()
-            .getTask(writer, null, null, AireDoclet.class, null, paths);
+            .getTask(writer, null, null, AireDoclet.class, List.of("--show-members", "private"),
+                paths);
     tool.call();
     val current = processingContext.get();
     if (current == null) {
@@ -70,4 +76,21 @@ public class AireDocumentationManager {
     }
     log.info("Successfully loaded component parsers");
   }
+
+  public static ProcessingContext parse(Writer writer, String... contents) {
+    Collection<JavaFileObject> fileObjects = Arrays.stream(contents).map(AireJavaFileObject::new)
+        .collect(
+            Collectors.toList());
+    return parse(writer, fileObjects);
+  }
+
+  public static ProcessingContext parse(String... contents) {
+    return parse(new PrintWriter(System.out), contents);
+  }
+
+  public static ProcessingContext parse(URI uri, String contents) {
+    val obj = new AireJavaFileObject(uri, contents);
+    return parse(new PrintWriter(System.out), Collections.singletonList(obj));
+  }
+
 }

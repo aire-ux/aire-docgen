@@ -2,8 +2,7 @@ package airedocs;
 
 
 /**
- * @component
- * @name Button
+ * @component Button
  *
  *
  * @article Documentation
@@ -13,6 +12,12 @@ package airedocs;
  * @section
  * arbitrary Markdown here
  *
+ *
+ * <code lang="java">
+ *   // java code
+ * </code>
+ * <code lang="scala">
+ *</code>
  * <code>
  *   ```java
  *   AireButton b = new AireButton();

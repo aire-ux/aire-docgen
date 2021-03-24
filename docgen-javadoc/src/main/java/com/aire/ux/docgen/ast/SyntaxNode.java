@@ -2,12 +2,15 @@ package com.aire.ux.docgen.ast;
 
 import com.sun.source.doctree.DocTree;
 import java.util.List;
+import javax.lang.model.element.Element;
 
 public interface SyntaxNode {
 
   Symbol getSymbol();
 
-  DocTree getSource();
+  DocTree getComment();
+
+  Element getSource();
 
   String getContent();
 
@@ -15,9 +18,9 @@ public interface SyntaxNode {
 
   boolean hasChildren();
 
-  //  private Symbol symbol,
-  //  DocTree element,
-  //  String content,
-  //  List<SyntaxNode> children
+  boolean addChild(SyntaxNode child);
+
+  void setContent(String content);
+
 
 }

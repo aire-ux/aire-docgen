@@ -33,6 +33,14 @@ public class AireJavaFileObject extends SimpleJavaFileObject {
     this.contents = contents;
   }
 
+  public AireJavaFileObject(URI uri, CharSequence contents) {
+    this(uri, contents, Kind.SOURCE);
+  }
+
+  public AireJavaFileObject(CharSequence contents) {
+    this(URI.create("mem://source/mem/java"), contents, Kind.SOURCE);
+  }
+
   /**
    * @param file the file to load
    * @param kind the kind that is backed by the path
