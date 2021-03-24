@@ -10,12 +10,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.IntPredicate;
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 import lombok.val;
 
+@NotThreadSafe
 @SuppressWarnings({
-    "PMD.AssignmentInOperand",
-    "PMD.CompareObjectsWithEquals",
-    "PMD.UseEqualsToCompareStrings"
+  "PMD.AssignmentInOperand",
+  "PMD.CompareObjectsWithEquals",
+  "PMD.UseEqualsToCompareStrings"
 })
 public class CodeBlockParser {
 
@@ -23,6 +25,7 @@ public class CodeBlockParser {
   private final DocTree source;
   private int end;
   private int start;
+  private boolean parsed;
 
   public CodeBlockParser(@Nonnull String content) {
     this(content, null);
@@ -31,6 +34,7 @@ public class CodeBlockParser {
   public CodeBlockParser(String content, final DocTree source) {
     this.end = 0;
     this.start = 0;
+    this.parsed = false;
     this.source = source;
     this.content = content;
   }
@@ -43,7 +47,19 @@ public class CodeBlockParser {
     return end;
   }
 
+  public String getExtractedContent() {
+    if (!parsed) {
+      throw new IllegalStateException("Error: call parse() before calling this method");
+    }
 
+    if (start == 0) {
+      return content;
+    }
+
+    return content
+        .substring(0, getStart() - "<code>".length())
+        .concat(content.substring(getEnd() + "</code>".length()));
+  }
 
   public List<SyntaxNode> parse() {
     int start = locate("<code>");
@@ -57,9 +73,10 @@ public class CodeBlockParser {
     this.start = start;
     val results = new ArrayList<SyntaxNode>();
     doParse(results);
-    if(consumeUntil(e -> true, this.end, "</code>") == -1) {
+    if (consumeUntil(e -> true, this.end, "</code>") == -1) {
       throw new ParsingException("Expected </code>--didn't get it (at %s)".formatted(this.end));
     }
+    parsed = true;
     return results;
   }
 
@@ -69,7 +86,6 @@ public class CodeBlockParser {
       results.add(node);
     }
   }
-
 
   private SyntaxNode parseCodeBlock() {
     this.end = chompWhitespace(this.end);
@@ -104,8 +120,9 @@ public class CodeBlockParser {
           return i;
         }
         if (!predicate.test(ch) && ch != value.charAt(j)) {
-          throw new ParsingException("Unexpected content '%c' at location %d (expected '%c')"
-              .formatted(ch, i, value.charAt(j)));
+          throw new ParsingException(
+              "Unexpected content '%c' at location %d (expected '%c')"
+                  .formatted(ch, i, value.charAt(j)));
         }
       }
     }

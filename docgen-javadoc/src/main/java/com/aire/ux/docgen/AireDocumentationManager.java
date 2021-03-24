@@ -7,12 +7,14 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Stack;
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@NotThreadSafe
 public class AireDocumentationManager {
 
   static final Logger log = LogManager.getLogger(AireDocumentationManager.class);

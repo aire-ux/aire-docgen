@@ -120,9 +120,9 @@ class CodeBlockParserTest {
     val expression = """
         helloadfadf
         <code>
-                
-                
-                
+
+
+
         </code>
         """;
     val result = new CodeBlockParser(expression).parse();
@@ -143,7 +143,8 @@ class CodeBlockParserTest {
             ```
             </code>
             """
-            .formatted(content).strip();
+            .formatted(content)
+            .strip();
 
     val result = new CodeBlockParser(expr).parse();
     assertEquals(1, result.size());
@@ -154,7 +155,6 @@ class CodeBlockParserTest {
     assertEquals(content, extracted.getContent().trim());
   }
 
-
   @Test
   void ensureFullValuesWork() {
     val content = """
@@ -164,8 +164,8 @@ class CodeBlockParserTest {
     val expr =
         """
             aadsfasdfadfafasdfadf
-                        
-                        
+
+
             hello world
             <code>
             ```groovy
@@ -178,8 +178,8 @@ class CodeBlockParserTest {
                  results.add(node);
                }
              }
-                       
-                       
+
+
              private SyntaxNode parseCodeBlock() {
                this.end = chompWhitespace(this.end);
                val blockStart = consumeUntil(Character::isWhitespace, end, "`");
@@ -194,15 +194,16 @@ class CodeBlockParserTest {
                this.end = consumeUntil(Character::isWhitespace, end, "`");
                return new NamedSyntaxNode(name, Symbols.Code, source, content, Collections.emptyList());
              }
-                        
+
             ```
             </code>
-                        
-                        
+
+
                         basdfafadfg
             adfadgasdgasdgasdgf
             """
-            .formatted(content).strip();
+            .formatted(content)
+            .strip();
 
     val parser = new CodeBlockParser(expr);
     val result = parser.parse();
@@ -213,9 +214,8 @@ class CodeBlockParserTest {
     assertEquals("groovy", ((NamedSyntaxNode) extracted).getName());
     assertEquals(content, extracted.getContent().trim());
 
-    System.out.println(expr.substring(0, parser.getStart() - "<code>".length())
-        .concat(expr.substring(parser.getEnd() + "</code>".length()
-        )));
+    System.out.println(
+        expr.substring(0, parser.getStart() - "<code>".length())
+            .concat(expr.substring(parser.getEnd() + "</code>".length())));
   }
-
 }
