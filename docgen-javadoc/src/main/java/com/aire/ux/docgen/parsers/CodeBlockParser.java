@@ -15,12 +15,14 @@ import lombok.val;
 
 @NotThreadSafe
 @SuppressWarnings({
-  "PMD.AssignmentInOperand",
-  "PMD.CompareObjectsWithEquals",
-  "PMD.UseEqualsToCompareStrings"
+    "PMD.AssignmentInOperand",
+    "PMD.CompareObjectsWithEquals",
+    "PMD.UseEqualsToCompareStrings"
 })
 public class CodeBlockParser {
 
+  public static final String ISLAND_PREFIX = "<code>";
+  public static final String ISLAND_SUFFIX = "</code>";
   private final String content;
   private final DocTree source;
   private int end;
@@ -39,30 +41,27 @@ public class CodeBlockParser {
     this.content = content;
   }
 
-  int getStart() {
-    return start;
+  public boolean foundSections() {
+    return parsed && start > 0;
   }
 
-  int getEnd() {
-    return end;
-  }
 
   public String getExtractedContent() {
     if (!parsed) {
       throw new IllegalStateException("Error: call parse() before calling this method");
     }
 
-    if (start == 0) {
+    if (!foundSections()) {
       return content;
     }
 
     return content
-        .substring(0, getStart() - "<code>".length())
-        .concat(content.substring(getEnd() + "</code>".length()));
+        .substring(0, getStart() - ISLAND_PREFIX.length())
+        .concat(content.substring(getEnd() + ISLAND_SUFFIX.length()));
   }
 
   public List<SyntaxNode> parse() {
-    int start = locate("<code>");
+    int start = locate(ISLAND_PREFIX);
     if (start == -1) {
       this.start = 0;
       this.end = content.length();
@@ -73,13 +72,20 @@ public class CodeBlockParser {
     this.start = start;
     val results = new ArrayList<SyntaxNode>();
     doParse(results);
-    if (consumeUntil(e -> true, this.end, "</code>") == -1) {
+    if (consumeUntil(e -> true, this.end, ISLAND_SUFFIX) == -1) {
       throw new ParsingException("Expected </code>--didn't get it (at %s)".formatted(this.end));
     }
     parsed = true;
     return results;
   }
 
+  int getStart() {
+    return start;
+  }
+
+  int getEnd() {
+    return end;
+  }
   private void doParse(ArrayList<SyntaxNode> results) {
     SyntaxNode node;
     while ((node = parseCodeBlock()) != null && end < content.length()) {
