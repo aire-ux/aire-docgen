@@ -1,1 +1,4 @@
+com.aire.ux.docgen.parsers.ArticleParser
+com.aire.ux.docgen.parsers.SectionParser
+com.aire.ux.docgen.parsers.ComponentNameParser
 com.aire.ux.docgen.parsers.ComponentDocumentationParser

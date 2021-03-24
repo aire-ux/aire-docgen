@@ -50,15 +50,15 @@ public class DocumentationParser extends ElementScanner9<Void, Integer> {
       if (commentTree != null) {
         val parser = lookupAndCache(commentTree);
         if (parser != null) {
-          val context = new Context(element, commentTree.getBlockTags());
-          return parser.parse(context);
+          val context = new Context(element, parsers, commentTree.getBlockTags());
+          return new AbstractSyntaxTree(parser.parse(context), context);
         }
       }
     }
     return null;
   }
 
-  private Parser lookupAndCache(DocTree tree) {
+  Parser lookupAndCache(DocTree tree) {
     val existing = parserCache.get(tree.getKind());
     if (existing != null) {
       return existing;

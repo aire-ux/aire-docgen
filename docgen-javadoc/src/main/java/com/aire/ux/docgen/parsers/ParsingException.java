@@ -18,8 +18,8 @@ public class ParsingException extends RuntimeException {
     super(cause);
   }
 
-  protected ParsingException(String message, Throwable cause, boolean enableSuppression,
-      boolean writableStackTrace) {
+  protected ParsingException(
+      String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 }

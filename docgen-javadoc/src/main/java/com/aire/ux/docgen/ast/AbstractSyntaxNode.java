@@ -12,14 +12,13 @@ public class AbstractSyntaxNode implements SyntaxNode {
   final String content;
   final List<SyntaxNode> children;
 
-  public AbstractSyntaxNode(Symbol symbol, DocTree source, String content,
-      List<SyntaxNode> children) {
+  public AbstractSyntaxNode(
+      Symbol symbol, DocTree source, String content, List<SyntaxNode> children) {
     this.symbol = symbol;
     this.source = source;
     this.content = content;
     this.children = children;
   }
-
 
   @Override
   public Symbol getSymbol() {

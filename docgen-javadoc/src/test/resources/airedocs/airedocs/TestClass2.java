@@ -5,10 +5,10 @@ package airedocs;
  * @component
  * @name Button
  *
- * *this is some* textual _content_
  *
  * @article Documentation
  *
+ * *this is some* textual _content_
  *
  * @section
  * arbitrary Markdown here
@@ -40,11 +40,6 @@ package airedocs;
  *   </dependency>
  *   ```
  * </code>
- *
- *
- *
- *
- *
  */
 public class TestClass2 {
 

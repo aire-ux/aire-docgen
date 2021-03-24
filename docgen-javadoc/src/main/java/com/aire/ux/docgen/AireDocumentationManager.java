@@ -2,6 +2,7 @@ package com.aire.ux.docgen;
 
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.ServiceLoader;
@@ -26,7 +27,7 @@ public class AireDocumentationManager {
   }
 
   public static ProcessingContext parse(final Collection<JavaFileObject> paths) {
-    return parse(new PrintWriter(System.out), paths);
+    return parse(new PrintWriter(System.out, true, StandardCharsets.UTF_8), paths);
   }
 
   public static ProcessingContext parse(
