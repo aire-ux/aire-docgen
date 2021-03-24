@@ -21,7 +21,7 @@ public class ComponentDocumentationParser extends AbstractBlockTagTreeParser {
       (DocTree node) -> (node instanceof BlockTagTree tree ? tree.getTagName() : node.toString());
 
   public ComponentDocumentationParser() {
-    super(TAG_NAME);
+    super(TAG_NAME, true);
   }
 
   @Override
@@ -61,13 +61,16 @@ public class ComponentDocumentationParser extends AbstractBlockTagTreeParser {
       throw new ParsingException("Error: assertion that element of type <root> existed was false");
     }
 
+    val content = collectContent(root);
+    val chs = parseChildren(context, children);
+    chs.addAll(content.snd);
     val rootNode =
         new NamedSyntaxNode(
             root.getTagName(),
             Symbols.Component,
             root,
-            collectContent(root),
-            parseChildren(context, children));
+            content.fst,
+            chs);
     return rootNode;
   }
 

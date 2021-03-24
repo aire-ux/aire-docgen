@@ -40,6 +40,11 @@ public class AbstractSyntaxNode implements SyntaxNode {
     return Collections.unmodifiableList(children);
   }
 
+  @Override
+  public boolean hasChildren() {
+    return !(children == null || children.isEmpty());
+  }
+
   public void addChild(@Nonnull SyntaxNode child) {
     children.add(child);
   }

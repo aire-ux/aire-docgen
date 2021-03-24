@@ -16,4 +16,13 @@ public class AireComponentElementParserTest {
 
     assertNotNull(result);
   }
+
+  @Test
+  void ensureToStringIsCorrect() {
+    val objs = loadFromClassPath("airedocs/airedocs/TestClass2.java");
+    val result = AireDocumentationManager.parse(new PrintWriter(System.out), objs);
+
+    System.out.println(result.getSyntaxTree().toString());
+
+  }
 }

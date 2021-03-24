@@ -13,6 +13,8 @@ public interface SyntaxNode {
 
   List<SyntaxNode> getChildren();
 
+  boolean hasChildren();
+
   //  private Symbol symbol,
   //  DocTree element,
   //  String content,

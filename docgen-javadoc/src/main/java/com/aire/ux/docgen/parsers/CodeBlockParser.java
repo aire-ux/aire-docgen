@@ -23,7 +23,7 @@ public class CodeBlockParser {
 
   public static final String ISLAND_PREFIX = "<code>";
   public static final String ISLAND_SUFFIX = "</code>";
-  private final String content;
+  private final CharSequence content;
   private final DocTree source;
   private int end;
   private int start;
@@ -33,7 +33,7 @@ public class CodeBlockParser {
     this(content, null);
   }
 
-  public CodeBlockParser(String content, final DocTree source) {
+  public CodeBlockParser(CharSequence content, final DocTree source) {
     this.end = 0;
     this.start = 0;
     this.parsed = false;
@@ -46,7 +46,7 @@ public class CodeBlockParser {
   }
 
 
-  public String getExtractedContent() {
+  public CharSequence getExtractedContent() {
     if (!parsed) {
       throw new IllegalStateException("Error: call parse() before calling this method");
     }
@@ -55,9 +55,13 @@ public class CodeBlockParser {
       return content;
     }
 
-    return content
-        .substring(0, getStart() - ISLAND_PREFIX.length())
-        .concat(content.substring(getEnd() + ISLAND_SUFFIX.length()));
+    val length = (getStart() - ISLAND_PREFIX.length()) + (getEnd() + ISLAND_SUFFIX.length());
+    val result = new StringBuilder(length);
+    return result.append(content.subSequence(0, getStart() - ISLAND_PREFIX.length()))
+        .append( content.subSequence(getEnd() + ISLAND_SUFFIX.length(), content.length())
+    );
+
+
   }
 
   public List<SyntaxNode> parse() {
@@ -65,6 +69,7 @@ public class CodeBlockParser {
     if (start == -1) {
       this.start = 0;
       this.end = content.length();
+      parsed = true;
       return Collections.emptyList();
     }
 
