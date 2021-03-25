@@ -1,4 +1,9 @@
 include(
+        'docgen-ui',
         'docgen-api',
-        'docgen-javadoc'
+        'docgen-javadoc',
+        'aire-ux:aire-api',
+        'aire-ux:aire-core',
+        'aire-ux:aire-test',
+        'aire-ux:aire-components',
 )
