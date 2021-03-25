@@ -7,7 +7,6 @@ import javax.lang.model.element.Element;
 
 public interface SyntaxNode {
 
-
   Symbol getSymbol();
 
   DocTree getComment();
@@ -24,7 +23,6 @@ public interface SyntaxNode {
 
   void setContent(String content);
 
-
   String getProperty(String key);
 
   boolean hasProperty(String key);
@@ -34,5 +32,4 @@ public interface SyntaxNode {
   Map<String, String> getProperties();
 
   String clearProperty(String key);
-
 }

@@ -20,22 +20,21 @@ public class PropertyParser implements Parser {
 
   @Override
   public boolean appliesTo(@Nonnull Element element, @Nullable DocTree tree) {
-    return element.getKind() == ElementKind.FIELD &&
-        tree.getKind() == Kind.UNKNOWN_BLOCK_TAG;
+    return element.getKind() == ElementKind.FIELD && tree.getKind() == Kind.UNKNOWN_BLOCK_TAG;
   }
 
   @Override
-  public SyntaxNode parse(@Nonnull Element element, @Nullable DocTree tree) {
+  public SyntaxNode parse(@Nonnull Element element, DocTree tree) {
     val variable = (VariableElement) element;
     val name = variable.getSimpleName().toString();
     val type = variable.asType().toString();
-    val node = new NamedSyntaxNode(
-        name,
-        PropertySymbol,
-        element,
-        tree,
-        Parsing.extractTextNodes(((UnknownBlockTagTree) tree).getContent())
-    );
+    val node =
+        new NamedSyntaxNode(
+            name,
+            PropertySymbol,
+            element,
+            tree,
+            Parsing.extractTextNodes(((UnknownBlockTagTree) tree).getContent()));
     node.setProperty("type", type);
     return node;
   }

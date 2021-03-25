@@ -1,5 +1,6 @@
 package com.aire.ux.docgen;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URI;
@@ -43,8 +44,8 @@ public class AireDocumentationManager {
     AireDoclet.setFiles(paths);
     val tool =
         ToolProvider.getSystemDocumentationTool()
-            .getTask(writer, null, null, AireDoclet.class, List.of("--show-members", "private"),
-                paths);
+            .getTask(
+                writer, null, null, AireDoclet.class, List.of("--show-members", "private"), paths);
     tool.call();
     val current = processingContext.get();
     if (current == null) {
@@ -78,19 +79,19 @@ public class AireDocumentationManager {
   }
 
   public static ProcessingContext parse(Writer writer, String... contents) {
-    Collection<JavaFileObject> fileObjects = Arrays.stream(contents).map(AireJavaFileObject::new)
-        .collect(
-            Collectors.toList());
+    Collection<JavaFileObject> fileObjects =
+        Arrays.stream(contents).map(AireJavaFileObject::new).collect(Collectors.toList());
     return parse(writer, fileObjects);
   }
 
+  @SuppressFBWarnings
   public static ProcessingContext parse(String... contents) {
     return parse(new PrintWriter(System.out), contents);
   }
 
+  @SuppressFBWarnings
   public static ProcessingContext parse(URI uri, String contents) {
     val obj = new AireJavaFileObject(uri, contents);
     return parse(new PrintWriter(System.out), Collections.singletonList(obj));
   }
-
 }

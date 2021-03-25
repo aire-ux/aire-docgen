@@ -5,14 +5,14 @@ import lombok.val;
 
 public class AbstractSyntaxTree {
 
-  static final Symbol ROOT_SYMBOL = new Symbol() {
+  static final Symbol ROOT_SYMBOL =
+      new Symbol() {
 
-    public String toString() {
-      return "RootSymbol";
-    }
-  };
-  @Getter
-  private final SyntaxNode root;
+        public String toString() {
+          return "RootSymbol";
+        }
+      };
+  @Getter private final SyntaxNode root;
 
   public AbstractSyntaxTree(SyntaxNode root) {
     this.root = root;
@@ -24,16 +24,11 @@ public class AbstractSyntaxTree {
 
   public String toString() {
     val result = new StringBuilder();
-    toString(
-        root,
-        result,
-        "",
-        true);
+    toString(root, result, "", true);
     return result.toString();
   }
 
-  private void toString(SyntaxNode node, StringBuilder out, String indent,
-      boolean last) {
+  private void toString(SyntaxNode node, StringBuilder out, String indent, boolean last) {
 
     if (node == root) {
       out.append(node).append("\n");

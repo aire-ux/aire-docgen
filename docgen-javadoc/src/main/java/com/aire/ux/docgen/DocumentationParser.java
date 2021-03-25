@@ -7,6 +7,7 @@ import com.sun.source.doctree.DocTree;
 import com.sun.source.doctree.UnknownBlockTagTree;
 import com.sun.source.util.DocTrees;
 import com.sun.source.util.SimpleDocTreeVisitor;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.timeandspace.smoothie.SwissTable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,7 +35,6 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
     parsers = new ArrayList<>();
   }
 
-
   private final Reporter reporter;
   private final Stack<SyntaxNode> nodes;
   private final DocTrees documentForest;
@@ -47,7 +47,6 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
     this.environment = environment;
     this.documentForest = docTrees;
 
-
     this.nodes = new Stack<>();
     this.visited = new SwissTable<>();
     this.parserCache = new HashMap<>();
@@ -59,21 +58,20 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
     log.info("Successfully registered parser");
   }
 
-
   public AbstractSyntaxTree process(Set<? extends Element> elements) {
     val result = new AbstractSyntaxTree();
     scan(elements, result.getRoot());
     return result;
   }
 
-
+  @SuppressFBWarnings
   public SyntaxNode scan(Element e, SyntaxNode parent) {
     SyntaxNode pnode = parent;
     if (!visited(e)) {
       val tree = documentForest.getDocCommentTree(e);
       if (e != null) {
         val node = new TagVisitor(parent, e).visit(tree, null);
-        if(node != null) {
+        if (node != null) {
           pnode = node;
         }
       }
@@ -111,7 +109,6 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
     public SyntaxNode visitDocComment(DocCommentTree tree, Void p) {
       return visit(tree.getBlockTags(), null);
     }
-
 
     public SyntaxNode visitUnknownBlockTag(UnknownBlockTagTree tree, Void p) {
       val parser = lookupAndCache(element, tree);

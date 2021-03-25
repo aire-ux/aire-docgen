@@ -8,11 +8,14 @@ import lombok.val;
 
 public class NamedSyntaxNode extends AbstractSyntaxNode {
 
-  @Getter
-  final String name;
+  @Getter final String name;
 
   public NamedSyntaxNode(
-      String name, Symbol symbol, Element source, DocTree comment, String content,
+      String name,
+      Symbol symbol,
+      Element source,
+      DocTree comment,
+      String content,
       List<SyntaxNode> children) {
     super(symbol, source, content, comment, children);
     this.name = name;
@@ -33,8 +36,12 @@ public class NamedSyntaxNode extends AbstractSyntaxNode {
 
     return """
         %s[symbol:%s, name: %s]{%s}
-        """.strip()
-        .formatted(getClass().getSimpleName(), symbol, name,
+        """
+        .strip()
+        .formatted(
+            getClass().getSimpleName(),
+            symbol,
+            name,
             content == null ? null : content.replaceAll("\\n", " "));
   }
 }

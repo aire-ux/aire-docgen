@@ -6,7 +6,6 @@ import lombok.val;
 
 public class Parsing {
 
-
   public static String extractTextNodes(Iterable<? extends DocTree> tree) {
     val result = new StringBuilder();
     for (val node : tree) {
@@ -16,5 +15,4 @@ public class Parsing {
     }
     return result.toString();
   }
-
 }

@@ -1,6 +1,5 @@
 package com.aire.ux.docgen.parsers;
 
-
 import com.aire.ux.docgen.ast.NamedSyntaxNode;
 import com.aire.ux.docgen.ast.SyntaxNode;
 import com.sun.source.doctree.AttributeTree;
@@ -65,12 +64,8 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
       }
       val language = textualContent.pop();
 
-      val codeNode = new NamedSyntaxNode(
-          language,
-          ComponentElementParser.CodeElement,
-          element,
-          node
-      );
+      val codeNode =
+          new NamedSyntaxNode(language, ComponentElementParser.CodeElement, element, node);
       nodes.push(codeNode);
     }
     return null;
@@ -89,9 +84,9 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
   @Override
   public List<SyntaxNode> visitUnknownBlockTag(UnknownBlockTagTree node, Set<DocTree> unused) {
     val result = new ArrayList<SyntaxNode>();
-    for(val c : node.getContent()) {
+    for (val c : node.getContent()) {
       val cr = super.visit(c, unused);
-      if(cr != null) {
+      if (cr != null) {
         result.addAll(cr);
       }
     }

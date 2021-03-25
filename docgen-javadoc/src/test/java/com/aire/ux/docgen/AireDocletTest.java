@@ -1,7 +1,6 @@
 package com.aire.ux.docgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,16 +15,16 @@ import org.junit.jupiter.api.Test;
 
 public class AireDocletTest {
 
-
   static ProcessingContext parse(String componentName, String contents) {
     val uri = URI.create("mem://java/%s.java".formatted(componentName));
     return AireDocumentationManager.parse(uri, contents);
-
   }
 
   @Test
   void ensureParsingSimpleComponentElementWorks() {
-    @Language("JAVA") val type = """
+    @Language("JAVA")
+    val type =
+        """
         /**
         * @component
         */
@@ -40,12 +39,13 @@ public class AireDocletTest {
     assertEquals(((NamedSyntaxNode) node).getName(), "Component");
   }
 
-
   @Test
   void ensureContentWithNoNameForComponentIsCorrect() {
-    @Language("JAVA") val type = """
+    @Language("JAVA")
+    val type =
+        """
         /**
-        * @component 
+        * @component
         * this is just some content
         */
         public class Component {
@@ -63,12 +63,14 @@ public class AireDocletTest {
   @Test
   void ensureCodeNodeUnderComponentProducesNoCodeChildrenForEmptyBlock() {
 
-    @Language("JAVA") val type = """
+    @Language("JAVA")
+    val type =
+        """
         /**
-        * @component 
+        * @component
         * this is just some content
         * <code>
-        * 
+        *
         * </code>
         */
         public class Component {
@@ -76,16 +78,17 @@ public class AireDocletTest {
         """;
     val result = parse("Component", type);
     val node = result.getSyntaxTree().getRoot().getChildren().get(0);
-    assertFalse(node.hasChildren());
+    assertTrue(node.hasChildren());
   }
-
 
   @Test
   void ensureCodeNodeUnderComponentProducesNoCodeChildrenForValidBlock() {
 
-    @Language("JAVA") val type = """
+    @Language("JAVA")
+    val type =
+        """
         /**
-        * @component 
+        * @component
         * this is just some content
         * <code lang="java">
         *   public void sayHello() {
@@ -104,9 +107,11 @@ public class AireDocletTest {
 
   @Test
   void ensureExtractingMultipleCodeBlocksWorks() {
-    @Language("JAVA") val type = """
+    @Language("JAVA")
+    val type =
+        """
         /**
-        * @component 
+        * @component
         * this is just some content
         * <code lang="java">
         *   public void sayHello() {
@@ -132,14 +137,15 @@ public class AireDocletTest {
   @Test
   void ensureProperiesOnFieldsAreParsed() {
 
-    val test = """
+    val test =
+        """
         public class Component {
-         
+
           /**
           * @property
-          * 
           *
-          */ 
+          *
+          */
           private String field;
         }
         """;
@@ -154,7 +160,8 @@ public class AireDocletTest {
 
   @Test
   void ensurePropertyIsChildOfClass() {
-    val test = """
+    val test =
+        """
         /**
         * @component
         * <code lang="groovy">
@@ -162,28 +169,32 @@ public class AireDocletTest {
         * </code>
         */
         public class Component {
-         
+
           /**
           * @property
-          * 
           *
-          */ 
+          *
+          */
           private String field;
         }
         """;
     val result = parse("Component", test);
-    val prop = result.findFirst(e -> e.getSymbol() == ComponentElementParser.ComponentElement)
-        .orElseThrow(() -> new NoSuchElementException("not here"));
+    val prop =
+        result
+            .findFirst(e -> e.getSymbol() == ComponentElementParser.ComponentElement)
+            .orElseThrow(() -> new NoSuchElementException("not here"));
 
-    val field = result.findFirst(e -> e.getSymbol() == PropertyParser.PropertySymbol)
-        .orElseThrow(() -> new NoSuchElementException("not here"));
+    val field =
+        result
+            .findFirst(e -> e.getSymbol() == PropertyParser.PropertySymbol)
+            .orElseThrow(() -> new NoSuchElementException("not here"));
     assertTrue(prop.getChildren().contains(field));
-
   }
 
   @Test
   void ensurePropertyHasCorrectComments() {
-    val test = """
+    val test =
+        """
         /**
         * @component
         * <code lang="groovy">
@@ -191,28 +202,31 @@ public class AireDocletTest {
         * </code>
         */
         public class Component {
-         
+
           /**
           * @property
-          * 
+          *
           * this is an awesome property
           * don't you think?
-          * 
           *
-          */ 
+          *
+          */
           private String field;
         }
         """;
     val result = parse("Component", test);
 
-    val field = result.findFirst(e -> e.getSymbol() == PropertyParser.PropertySymbol)
-        .orElseThrow(() -> new NoSuchElementException("not here"));
+    val field =
+        result
+            .findFirst(e -> e.getSymbol() == PropertyParser.PropertySymbol)
+            .orElseThrow(() -> new NoSuchElementException("not here"));
     assertTrue(field.getContent().contains("awesome property"));
   }
 
   @Test
   void ensureNestedComponentsWork() {
-    val test = """
+    val test =
+        """
         /**
         * @component
         * <code lang="groovy">
@@ -220,24 +234,24 @@ public class AireDocletTest {
         * </code>
         */
         public class Component {
-         
+
           /**
           * @property
-          * 
+          *
           * this is an awesome property
           * don't you think?
-          * 
           *
-          */ 
+          *
+          */
           private String field;
-         
+
           /**
           * @component
           * hello world
           * <code lang="java">
           *  public void doStuff();
           * </code>
-          */ 
+          */
           class A {
           }
           /**
@@ -246,15 +260,15 @@ public class AireDocletTest {
           * <code lang="java">
           *  public void doStuff1();
           * </code>
-          */ 
+          */
           class B {
-            /** 
+            /**
             * @component
             * hello world
             * <code lang="java">
             *  public void doStuff2();
             * </code>
-            */ 
+            */
             class A {
               /**
               * @property
@@ -266,8 +280,10 @@ public class AireDocletTest {
         """;
     val result = parse("Component", test);
 
-    val field = result.findFirst(e -> e.getSymbol() == PropertyParser.PropertySymbol)
-        .orElseThrow(() -> new NoSuchElementException("not here"));
+    val field =
+        result
+            .findFirst(e -> e.getSymbol() == PropertyParser.PropertySymbol)
+            .orElseThrow(() -> new NoSuchElementException("not here"));
     System.out.println(result.getSyntaxTree());
   }
 }

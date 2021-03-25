@@ -17,20 +17,15 @@ import lombok.val;
 
 public class ProcessingContext {
 
-  @Getter
-  final Locale locale;
-  @Getter
-  final Reporter reporter;
+  @Getter final Locale locale;
+  @Getter final Reporter reporter;
 
-  @Getter
-  @Setter
-  private AbstractSyntaxTree syntaxTree;
+  @Getter @Setter private AbstractSyntaxTree syntaxTree;
 
   public ProcessingContext(Locale locale, Reporter reporter) {
     this.locale = locale;
     this.reporter = reporter;
   }
-
 
   /**
    * @param predicate the predicate to apply

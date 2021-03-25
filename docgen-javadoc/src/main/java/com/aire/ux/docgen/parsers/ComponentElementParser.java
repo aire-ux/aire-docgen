@@ -7,6 +7,7 @@ import com.aire.ux.docgen.ast.SyntaxNode;
 import com.sun.source.doctree.DocTree;
 import com.sun.source.doctree.DocTree.Kind;
 import com.sun.source.doctree.UnknownBlockTagTree;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Element;
@@ -15,9 +16,8 @@ import lombok.val;
 
 public class ComponentElementParser implements Parser {
 
-
-  public static Symbol CodeElement = new DefaultSymbol("code");
-  public static Symbol ComponentElement = new DefaultSymbol("component");
+  @SuppressFBWarnings public static final Symbol CodeElement = new DefaultSymbol("code");
+  @SuppressFBWarnings public static final Symbol ComponentElement = new DefaultSymbol("component");
 
   @Override
   public boolean appliesTo(@Nonnull Element element, DocTree tree) {
@@ -47,6 +47,4 @@ public class ComponentElementParser implements Parser {
     }
     return textualContent.toString();
   }
-
-
 }

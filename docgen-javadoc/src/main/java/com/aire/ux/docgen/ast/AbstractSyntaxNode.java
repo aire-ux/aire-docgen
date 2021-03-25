@@ -10,18 +10,15 @@ import javax.lang.model.element.Element;
 
 public class AbstractSyntaxNode implements SyntaxNode {
 
-  /**
-   * immutable state
-   */
+  /** immutable state */
   final Symbol symbol;
+
   final Element source;
   final DocTree comment;
   final List<SyntaxNode> children;
   final Map<String, String> properties;
 
-  /**
-   * private state
-   */
+  /** private state */
   private String content;
 
   public AbstractSyntaxNode(Symbol symbol, Element source, DocTree comment) {
@@ -29,8 +26,8 @@ public class AbstractSyntaxNode implements SyntaxNode {
   }
 
   /**
-   * @param symbol  the associated symbol (element type)
-   * @param source  the language element this was retrieved from
+   * @param symbol the associated symbol (element type)
+   * @param source the language element this was retrieved from
    * @param content the String content (if any)
    * @param comment the actual comment node (if any)
    */
@@ -38,8 +35,8 @@ public class AbstractSyntaxNode implements SyntaxNode {
     this(symbol, source, content, comment, new ArrayList<>());
   }
 
-  public AbstractSyntaxNode(Symbol symbol, Element source, String content,
-      DocTree comment, List<SyntaxNode> children) {
+  public AbstractSyntaxNode(
+      Symbol symbol, Element source, String content, DocTree comment, List<SyntaxNode> children) {
     this.symbol = symbol;
     this.source = source;
     this.content = content;
@@ -47,7 +44,6 @@ public class AbstractSyntaxNode implements SyntaxNode {
     this.children = children;
     this.properties = new LinkedHashMap<>();
   }
-
 
   @Override
   public Symbol getSymbol() {
