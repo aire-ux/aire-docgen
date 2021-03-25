@@ -3,16 +3,25 @@ package com.aire.ux.docgen.ast;
 import com.sun.source.doctree.DocTree;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.lang.model.element.Element;
 
 public class AbstractSyntaxNode implements SyntaxNode {
 
+  /**
+   * immutable state
+   */
   final Symbol symbol;
   final Element source;
   final DocTree comment;
   final List<SyntaxNode> children;
+  final Map<String, String> properties;
 
+  /**
+   * private state
+   */
   private String content;
 
   public AbstractSyntaxNode(Symbol symbol, Element source, DocTree comment) {
@@ -36,6 +45,7 @@ public class AbstractSyntaxNode implements SyntaxNode {
     this.content = content;
     this.comment = comment;
     this.children = children;
+    this.properties = new LinkedHashMap<>();
   }
 
 
@@ -62,6 +72,31 @@ public class AbstractSyntaxNode implements SyntaxNode {
   @Override
   public void setContent(String content) {
     this.content = content;
+  }
+
+  @Override
+  public String getProperty(String key) {
+    return properties.get(key);
+  }
+
+  @Override
+  public boolean hasProperty(String key) {
+    return properties.containsKey(key);
+  }
+
+  @Override
+  public String setProperty(String key, String value) {
+    return properties.put(key, value);
+  }
+
+  @Override
+  public Map<String, String> getProperties() {
+    return Collections.unmodifiableMap(properties);
+  }
+
+  @Override
+  public String clearProperty(String key) {
+    return properties.remove(key);
   }
 
   @Override

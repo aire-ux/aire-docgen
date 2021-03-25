@@ -2,9 +2,11 @@ package com.aire.ux.docgen.ast;
 
 import com.sun.source.doctree.DocTree;
 import java.util.List;
+import java.util.Map;
 import javax.lang.model.element.Element;
 
 public interface SyntaxNode {
+
 
   Symbol getSymbol();
 
@@ -22,5 +24,15 @@ public interface SyntaxNode {
 
   void setContent(String content);
 
+
+  String getProperty(String key);
+
+  boolean hasProperty(String key);
+
+  String setProperty(String key, String value);
+
+  Map<String, String> getProperties();
+
+  String clearProperty(String key);
 
 }

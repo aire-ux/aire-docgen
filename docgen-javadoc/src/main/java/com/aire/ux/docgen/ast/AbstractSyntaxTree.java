@@ -1,8 +1,5 @@
 package com.aire.ux.docgen.ast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import lombok.Getter;
 import lombok.val;
 
@@ -26,23 +23,22 @@ public class AbstractSyntaxTree {
   }
 
   public String toString() {
-    val os = new ByteArrayOutputStream();
-    val result = new PrintStream(os);
+    val result = new StringBuilder();
     toString(
         root,
         result,
         "",
         true);
-    return os.toString(StandardCharsets.UTF_8);
+    return result.toString();
   }
 
-  private void toString(SyntaxNode node, PrintStream out, String indent,
+  private void toString(SyntaxNode node, StringBuilder out, String indent,
       boolean last) {
 
     if (node == root) {
-      out.println(node);
+      out.append(node).append("\n");
     } else {
-      out.println(indent + (last ? "└╴ " : "├╴") + node.toString());
+      out.append(indent).append(last ? "└╴" : "├╴").append(node.toString()).append("\n");
     }
 
     indent = indent + (last ? "   " : "│  ");

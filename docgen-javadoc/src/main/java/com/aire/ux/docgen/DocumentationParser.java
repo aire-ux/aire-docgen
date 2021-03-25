@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -23,6 +24,7 @@ import lombok.val;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
 public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode> {
 
   static final Logger log = LogManager.getLogger(DocumentationParser.class);
@@ -34,6 +36,7 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
 
 
   private final Reporter reporter;
+  private final Stack<SyntaxNode> nodes;
   private final DocTrees documentForest;
   private final DocletEnvironment environment;
   private final Map<Element, Boolean> visited;
@@ -43,8 +46,11 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
     this.reporter = reporter;
     this.environment = environment;
     this.documentForest = docTrees;
-    this.parserCache = new HashMap<>();
+
+
+    this.nodes = new Stack<>();
     this.visited = new SwissTable<>();
+    this.parserCache = new HashMap<>();
   }
 
   public static void register(Parser service) {
@@ -62,15 +68,19 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
 
 
   public SyntaxNode scan(Element e, SyntaxNode parent) {
+    SyntaxNode pnode = parent;
     if (!visited(e)) {
       val tree = documentForest.getDocCommentTree(e);
       if (e != null) {
-        new TagVisitor(parent, e).visit(tree, null);
+        val node = new TagVisitor(parent, e).visit(tree, null);
+        if(node != null) {
+          pnode = node;
+        }
       }
       visited.put(e, true);
     }
 
-    return super.scan(e, parent);
+    return super.scan(e, pnode);
   }
 
   Parser lookupAndCache(Element tree, DocTree docTree) {
@@ -88,7 +98,7 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
     return result != null && result;
   }
 
-  final class TagVisitor extends SimpleDocTreeVisitor<Void, Void> {
+  final class TagVisitor extends SimpleDocTreeVisitor<SyntaxNode, Void> {
 
     final SyntaxNode node;
     final Element element;
@@ -98,27 +108,19 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
       this.element = element;
     }
 
-    public Void visitDocComment(DocCommentTree tree, Void p) {
+    public SyntaxNode visitDocComment(DocCommentTree tree, Void p) {
       return visit(tree.getBlockTags(), null);
     }
 
 
-    public Void visitUnknownBlockTag(UnknownBlockTagTree tree, Void p) {
+    public SyntaxNode visitUnknownBlockTag(UnknownBlockTagTree tree, Void p) {
       val parser = lookupAndCache(element, tree);
       if (parser != null) {
         val blockSyntaxNode = parser.parse(element, tree);
         node.addChild(blockSyntaxNode);
+        return blockSyntaxNode;
       }
-      super.visit(tree.getContent(), p);
-
-      checkClosures();
-      return null;
+      return super.visit(tree.getContent(), p);
     }
-
-
-    private void checkClosures() {
-
-    }
-
   }
 }
