@@ -1,0 +1,40 @@
+plugins {
+    id "com.vaadin" version "0.17.0.1"
+    id "org.springframework.boot" version "2.4.3"
+}
+
+
+dependencies {
+    implementation('com.vaadin:flow-server') {
+        project.properties['exclusions.groups'].split(',').each {
+            exclude(group: it.trim())
+        }
+    }
+
+
+    implementation ('com.vaadin:vaadin-spring-boot-starter') {
+        exclude(
+                group: 'org.springframework.boot',
+                module: 'spring-boot-starter-tomcat'
+        )
+    }
+
+    implementation('org.springframework.boot:spring-boot-starter-web') {
+        exclude(
+                group: 'org.springframework.boot',
+                module: 'spring-boot-starter-tomcat'
+        )
+    }
+    implementation 'org.springframework.boot:spring-boot-starter-undertow'
+}
+
+
+springBoot {
+    mainClass = 'com.aire.ux.docgenui.Application'
+}
+
+vaadin {
+    pnpmEnable = true
+    productionMode = false
+    frontendDirectory = file("${project.projectDir}/src/main/frontend")
+}
