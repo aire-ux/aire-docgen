@@ -26,6 +26,12 @@
 
       <dependency>
         <groupId>io.sunshower.arcus</groupId>
+        <artifactId>arcus-lang</artifactId>
+        <version>1.0.2.Final</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.sunshower.arcus</groupId>
         <artifactId>arcus-lambda</artifactId>
         <version>1.0.2.Final</version>
       </dependency>
@@ -34,6 +40,12 @@
         <groupId>io.sunshower.arcus</groupId>
         <artifactId>arcus-log</artifactId>
         <version>1.0.2.Final</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.timeandspace</groupId>
+        <artifactId>smoothie-map</artifactId>
+        <version>2.0.2</version>
       </dependency>
 
 

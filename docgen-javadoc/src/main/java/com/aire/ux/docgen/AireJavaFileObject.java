@@ -25,7 +25,7 @@ public class AireJavaFileObject extends SimpleJavaFileObject {
   /**
    * Construct a SimpleJavaFileObject of the given kind and with the given URI.
    *
-   * @param uri  the URI for this file object
+   * @param uri the URI for this file object
    * @param kind the kind of this file object
    */
   public AireJavaFileObject(URI uri, CharSequence contents, Kind kind) {
@@ -33,12 +33,19 @@ public class AireJavaFileObject extends SimpleJavaFileObject {
     this.contents = contents;
   }
 
+  public AireJavaFileObject(URI uri, CharSequence contents) {
+    this(uri, contents, Kind.SOURCE);
+  }
+
+  public AireJavaFileObject(CharSequence contents) {
+    this(URI.create("mem://source/mem/java"), contents, Kind.SOURCE);
+  }
+
   /**
    * @param file the file to load
    * @param kind the kind that is backed by the path
    * @throws IOException if reading the path occurs
    */
-
   public AireJavaFileObject(File file, Kind kind) throws IOException {
     this(file.toURI(), file.toPath(), kind);
   }
@@ -52,6 +59,7 @@ public class AireJavaFileObject extends SimpleJavaFileObject {
     this(uri, Files.readString(path), kind);
   }
 
+  @SuppressWarnings("PMD.AssignmentInOperand")
   private static CharSequence read(InputStream inputStream) throws IOException {
     val buffer = new ByteArrayOutputStream();
     int nRead;
