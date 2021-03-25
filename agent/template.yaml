@@ -1,0 +1,12 @@
+apiVersion: "v1"
+kind: "Pod"
+spec:
+  imagePullSecrets:
+    - name: docker-registry
+  containers:
+    - name: maven
+      image: 'sunshowercloud/sunshower-base:latest'
+      command:
+        - cat
+      tty: true
+
