@@ -17,6 +17,17 @@
         <module>exported</module>
     </modules>
 
+
+    <distributionManagement>
+        <repository>
+            <id>sunshower-releases</id>
+            <url>http://artifacts.sunshower.cloud/repository/sunshower-releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>sunshower-snapshots</id>
+            <url>http://artifacts.sunshower.cloud/repository/sunshower-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
     <repositories>
         <repository>
             <id>sunshower-snapshots</id>
