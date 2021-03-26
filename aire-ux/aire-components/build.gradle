@@ -1,0 +1,25 @@
+
+plugins {
+    id 'com.coditory.webjar' version '1.0.3' apply false
+}
+
+subprojects {
+
+//    configurations {
+//        /**
+//         *
+//         */
+//        zephyr {
+//            transitive = false
+//        }
+//
+//
+//        zephyr.extendsFrom(implementation)
+//
+//    }
+
+    dependencies {
+        implementation 'com.vaadin:flow-server'
+        implementation 'com.vaadin:flow-html-components'
+    }
+}

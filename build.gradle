@@ -148,7 +148,8 @@ subprojects {
 
 
         testImplementation 'org.junit-pioneer:junit-pioneer'
-        testImplementation 'org.junit.platform:junit-platform-suite-engine'
+//        testImplementation 'org.junit.platform:junit-platform-suite-engine:1.8.0-M1'
+
         [
                 'api',
                 'engine'

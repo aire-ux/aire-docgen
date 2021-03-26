@@ -26,6 +26,8 @@ dependencies {
         )
     }
     implementation 'org.springframework.boot:spring-boot-starter-undertow'
+
+    implementation project (':aire-ux:aire-components:aire-button')
 }
 
 

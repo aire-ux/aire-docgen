@@ -1,4 +1,5 @@
 include(
+        'onsen',
         'docgen-ui',
         'docgen-api',
         'docgen-javadoc',
@@ -6,4 +7,5 @@ include(
         'aire-ux:aire-core',
         'aire-ux:aire-test',
         'aire-ux:aire-components',
+        'aire-ux:aire-components:aire-button',
 )
