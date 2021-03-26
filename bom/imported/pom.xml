@@ -69,6 +69,11 @@
         <version>${byte-buddy.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>net.bytebuddy</groupId>
+        <artifactId>byte-buddy</artifactId>
+        <version>${byte-buddy.version}</version>
+      </dependency>
 <!--      <dependency>-->
 <!--        <groupId>org.vaadin.artur</groupId>-->
 <!--        <artifactId>a-vaadin-helper</artifactId>-->

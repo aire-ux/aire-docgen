@@ -1,6 +1,9 @@
 dependencies {
     implementation 'io.sunshower.arcus:arcus-log'
     implementation 'io.sunshower.arcus:arcus-lang'
+
+
+    implementation 'net.bytebuddy:byte-buddy'
     implementation 'net.bytebuddy:byte-buddy-agent'
 
 }

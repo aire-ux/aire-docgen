@@ -17,7 +17,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import transformed.PrivateNonFinalMember;
 
 @TestInstance(Lifecycle.PER_CLASS)
-class ClassRedefinitionAgentTest {
+class ClassRedefinitionServiceTest {
 
   private Instrumentation instrumentation;
 
@@ -44,23 +44,15 @@ class ClassRedefinitionAgentTest {
   }
 
   @Test
-  void ensureObtainingAgentWorks() throws Exception {
-
+  void ensureRedefiningClassWorksWithDefaultConstructor() throws Exception {
     val inst = new PrivateNonFinalMember();
-//    val inst =
-//        (PrivateNonFinalMember)
-//            Class.forName("transformed.PrivateNonFinalMember").getConstructor().newInstance();
-
     assertEquals("original", inst.getValue());
     val classDefinition =
         new ClassDefinition(
             PrivateNonFinalMember.class,
             readClass("test-classes/transformed/PrivateNonFinalMember.class"));
     instrumentation.redefineClasses(classDefinition);
-    val newInstance =
-        (PrivateNonFinalMember)
-            Class.forName("transformed.PrivateNonFinalMember").getConstructor().newInstance();
+    val newInstance = new PrivateNonFinalMember();
     assertEquals("transformed", newInstance.getValue());
-
   }
 }
