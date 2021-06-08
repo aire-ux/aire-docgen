@@ -1,8 +1,11 @@
 plugins {
 	id 'org.springframework.boot' version '2.4.4'
-	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'io.spring.dependency-management'
 	id 'java'
 	id 'com.vaadin' version '20.0.1'
+	id "io.freefair.jsass-war" version "6.0.0-m2"
+	id 'io.miret.etienne.sass' version '1.1.1'
+
 }
 
 defaultTasks("clean", "build")
@@ -20,6 +23,12 @@ configurations {
 	}
 }
 
+compileSass {
+	watch()
+	sourceDir = file("$projectDir/src/main/styles/")
+	outputDir = file("$projectDir/frontend/styles/")
+}
+
 dependencies {
 	implementation('com.vaadin:vaadin-spring-boot-starter') {
 //         Webjars are only needed when running in Vaadin 13 compatibility mode
@@ -28,7 +37,7 @@ dependencies {
 		 "org.webjars.bowergithub.vaadin", "org.webjars.bowergithub.webcomponents"]
 				.forEach { group -> exclude(group: group) }
 	}
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+//	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
