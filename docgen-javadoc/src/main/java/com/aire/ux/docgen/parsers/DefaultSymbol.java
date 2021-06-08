@@ -1,6 +1,6 @@
 package com.aire.ux.docgen.parsers;
 
-import com.aire.ux.docgen.ast.Symbol;
+import com.aire.ux.parsers.ast.Symbol;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 @SuppressFBWarnings

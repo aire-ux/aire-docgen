@@ -4,4 +4,8 @@ dependencies {
     implementation 'io.sunshower.arcus:arcus-log'
     implementation 'io.sunshower.arcus:arcus-lang'
     implementation 'io.sunshower.arcus:arcus-lambda'
+
+
+    implementation 'com.aire-ux.components:aire-test-common'
+    implementation 'com.aire-ux.components:aire-css-selectors'
 }

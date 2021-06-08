@@ -1,7 +1,7 @@
 package com.aire.ux.docgen;
 
-import com.aire.ux.docgen.ast.AbstractSyntaxTree;
-import com.aire.ux.docgen.ast.SyntaxNode;
+import com.aire.ux.parsers.ast.AbstractSyntaxTree;
+import com.aire.ux.parsers.ast.SyntaxNode;
 import io.sunshower.lambda.Option;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,6 @@ public class ProcessingContext {
     }
     val result = new ArrayList<SyntaxNode>();
     val node = syntaxTree.getRoot();
-
     val queue = new LinkedList<SyntaxNode>();
     queue.offer(node);
     while (!queue.isEmpty()) {

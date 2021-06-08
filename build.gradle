@@ -1,4 +1,11 @@
-
+buildscript {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url "https://maven.vaadin.com/vaadin-prereleases"
+        }
+    }
+}
 plugins {
     id 'pmd'
     id 'groovy'
@@ -21,7 +28,20 @@ allprojects {
         mavenCentral()
 
         maven {
-            url 'http://artifacts.sunshower.cloud/repository/sunshower-releases'
+            url uri("https://maven.pkg.github.com/sunshower-io/sunshower-arcus")
+            credentials {
+                username "$mavenRepositoryUsername"
+                password "$mavenRepositoryPassword"
+            }
+        }
+
+
+        maven {
+            url uri("https://maven.pkg.github.com/aire-ux/aire-components")
+            credentials {
+                username "$mavenRepositoryUsername"
+                password "$mavenRepositoryPassword"
+            }
         }
     }
 
@@ -30,8 +50,14 @@ allprojects {
         imports {
             mavenBom "com.aire-ux.docgen:bom-imported:$version"
         }
+
+        imports {
+            mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+        }
     }
 
+    sourceCompatibility = '15'
+    targetCompatibility = '15'
 
 }
 

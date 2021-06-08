@@ -4,9 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.aire.ux.docgen.ast.NamedSyntaxNode;
 import com.aire.ux.docgen.parsers.ComponentElementParser;
 import com.aire.ux.docgen.parsers.PropertyParser;
+import com.aire.ux.parsers.ast.NamedSyntaxNode;
+import com.aire.ux.parsers.ast.SyntaxNode;
 import java.net.URI;
 import java.util.NoSuchElementException;
 import lombok.val;
@@ -34,7 +35,7 @@ public class AireDocletTest {
 
     val result = parse("Component", type);
     assertNotNull(result.getSyntaxTree());
-    val node = result.getSyntaxTree().getRoot().getChildren().get(0);
+    SyntaxNode node = (SyntaxNode) result.getSyntaxTree().getRoot().getChildren().get(0);
     assertEquals(node.getSymbol(), ComponentElementParser.ComponentElement);
     assertEquals(((NamedSyntaxNode) node).getName(), "Component");
   }
@@ -77,7 +78,7 @@ public class AireDocletTest {
         }
         """;
     val result = parse("Component", type);
-    val node = result.getSyntaxTree().getRoot().getChildren().get(0);
+    SyntaxNode node = (SyntaxNode) result.getSyntaxTree().getRoot().getChildren().get(0);
     assertTrue(node.hasChildren());
   }
 

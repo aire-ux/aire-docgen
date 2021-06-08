@@ -1,6 +1,6 @@
 package com.aire.ux.docgen;
 
-import com.aire.ux.docgen.ast.SyntaxNode;
+import com.aire.ux.parsers.ast.SyntaxNode;
 import com.sun.source.doctree.DocTree;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

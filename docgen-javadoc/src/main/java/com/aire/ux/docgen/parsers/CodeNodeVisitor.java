@@ -1,7 +1,7 @@
 package com.aire.ux.docgen.parsers;
 
-import com.aire.ux.docgen.ast.NamedSyntaxNode;
-import com.aire.ux.docgen.ast.SyntaxNode;
+import com.aire.ux.parsers.ast.NamedSyntaxNode;
+import com.aire.ux.parsers.ast.SyntaxNode;
 import com.sun.source.doctree.AttributeTree;
 import com.sun.source.doctree.DocTree;
 import com.sun.source.doctree.EndElementTree;

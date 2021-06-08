@@ -1,11 +1,20 @@
+/**
+ * add the vaadin-prereleases repo
+ */
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            url "https://maven.vaadin.com/vaadin-prereleases"
+        }
+    }
+}
+
+/**
+ * project list
+ */
 include(
-        'onsen',
         'docgen-ui',
         'docgen-api',
-        'docgen-javadoc',
-        'aire-ux:aire-api',
-        'aire-ux:aire-core',
-        'aire-ux:aire-test',
-        'aire-ux:aire-components',
-        'aire-ux:aire-components:aire-button',
+        'docgen-javadoc'
 )

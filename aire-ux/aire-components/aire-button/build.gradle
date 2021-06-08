@@ -1,4 +1,0 @@
-dependencies {
-    implementation 'com.vaadin:flow-server'
-    implementation 'com.vaadin:flow-html-components'
-}

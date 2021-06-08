@@ -19,18 +19,29 @@
 
   <properties>
     <junit-jupiter-engine.version>5.8.0-M1</junit-jupiter-engine.version>
-    <vaadin-bom.version>19.0.2</vaadin-bom.version>
-    <arcus.version>1.0.2.Final</arcus.version>
+    <vaadin-bom.version>20.0.1</vaadin-bom.version>
+<!--    <vaadin-bom.version>14.5.1</vaadin-bom.version>-->
+    <arcus.version>1.0.32.Final</arcus.version>
     <smoothie-map.version>2.0.2</smoothie-map.version>
     <junit-pioneer.version>1.3.8</junit-pioneer.version>
     <spring.version>5.3.5</spring.version>
     <spring-boot.version>2.4.4</spring-boot.version>
     <vaadin-helper.version>1.6.0</vaadin-helper.version>
     <byte-buddy.version>1.10.22</byte-buddy.version>
+    <aire-ux.version>1.0.2.Final</aire-ux.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>com.aire-ux.components</groupId>
+        <artifactId>bom-exported</artifactId>
+        <version>${aire-ux.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <dependency>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-bom</artifactId>
@@ -74,11 +85,6 @@
         <artifactId>byte-buddy</artifactId>
         <version>${byte-buddy.version}</version>
       </dependency>
-<!--      <dependency>-->
-<!--        <groupId>org.vaadin.artur</groupId>-->
-<!--        <artifactId>a-vaadin-helper</artifactId>-->
-<!--        <version>${vaadin-helper.version}</version>-->
-<!--      </dependency>-->
 
       <dependency>
         <groupId>org.springframework.boot</groupId>

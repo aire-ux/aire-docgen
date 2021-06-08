@@ -11,11 +11,12 @@ const { InjectManifest } = require('workbox-webpack-plugin');
 const { DefinePlugin } = require('webpack');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
 // Flow plugins
 const StatsPlugin = require('@vaadin/stats-plugin');
 const ThemeLiveReloadPlugin = require('@vaadin/theme-live-reload-plugin');
-const { ApplicationThemePlugin, processThemeResources, extractThemeName } = require('@vaadin/application-theme-plugin');
+const { ApplicationThemePlugin, processThemeResources, extractThemeName, findParentThemes } = require('@vaadin/application-theme-plugin');
 
 const path = require('path');
 
@@ -25,30 +26,30 @@ const themePartRegex = /(\\|\/)themes\1[\s\S]*?\1/;
 // the folder of app resources:
 //  - flow templates for classic Flow
 //  - client code with index.html and index.[ts/js] for CCDM
-const frontendFolder = path.resolve(__dirname, 'src/main/frontend');
+const frontendFolder = path.resolve(__dirname, 'frontend');
 const frontendGeneratedFolder = path.resolve(__dirname, 'frontend/generated');
-const fileNameOfTheFlowGeneratedMainEntryPoint = path.resolve(__dirname, 'target/frontend/generated-flow-imports.js');
-const mavenOutputFolderForFlowBundledFiles = path.resolve(__dirname, 'target/META-INF/VAADIN/webapp');
-const mavenOutputFolderForResourceFiles = path.resolve(__dirname, 'target/META-INF/VAADIN');
+const fileNameOfTheFlowGeneratedMainEntryPoint = path.resolve(__dirname, 'build/frontend/generated-flow-imports.js');
+const mavenOutputFolderForFlowBundledFiles = path.resolve(__dirname, 'build/META-INF/VAADIN/webapp');
+const mavenOutputFolderForResourceFiles = path.resolve(__dirname, 'build/META-INF/VAADIN');
 const useClientSideIndexFileForBootstrapping = true;
-const clientSideIndexHTML = path.resolve(__dirname, 'target/index.html');
-const clientSideIndexEntryPoint = path.resolve(__dirname, 'src/main/frontend', 'generated/', 'vaadin.ts');;
-const devmodeGizmoJS = path.resolve(__dirname, 'target/flow-frontend/VaadinDevmodeGizmo.js');
+const clientSideIndexHTML = path.resolve(__dirname, 'build/index.html');
+const clientSideIndexEntryPoint = path.resolve(__dirname, 'frontend', 'generated/', 'vaadin.ts');;
+const devmodeGizmoJS = path.resolve(__dirname, 'build/flow-frontend/VaadinDevmodeGizmo.js');
 const pwaEnabled = true;
 const offlinePathEnabled = false;
 const offlinePath = '';
-const clientServiceWorkerEntryPoint = path.resolve(__dirname, 'target/sw');
+const clientServiceWorkerEntryPoint = path.resolve(__dirname, 'build/sw');
 // public path for resources, must match Flow VAADIN_BUILD
 const VAADIN = 'VAADIN';
 const build = 'build';
-// public path for resources, must match the request used in flow to get the
-const config = '../config';
+// public path for resources, must match the request used in flow to get the /build/stats.json file
+const config = 'config';
 const outputFolder = mavenOutputFolderForFlowBundledFiles;
 const indexHtmlPath = 'index.html';
 // folder for outputting vaadin-bundle and other fragments
 const buildFolder = path.resolve(outputFolder, VAADIN, build);
 // folder for outputting stats.json
-const confFolder = path.resolve(mavenOutputFolderForResourceFiles, 'config');
+const confFolder = path.resolve(mavenOutputFolderForResourceFiles, config);
 const serviceWorkerPath = 'sw.js';
 // file which is used by flow to read templates for server `@Id` binding
 const statsFile = `${confFolder}/stats.json`;
@@ -60,19 +61,18 @@ const projectStaticAssetsFolders = [
   frontendFolder
 ];
 
-const projectStaticAssetsOutputFolder = path.resolve(__dirname, 'target/META-INF/VAADIN/webapp/VAADIN/static');
+const projectStaticAssetsOutputFolder = path.resolve(__dirname, 'build/META-INF/VAADIN/webapp/VAADIN/static');
 
 // Folders in the project which can contain application themes
 const themeProjectFolders = projectStaticAssetsFolders.map((folder) =>
   path.resolve(folder, 'themes')
 );
 
+const tsconfigJsonFile = path.resolve(__dirname, 'tsconfig.json');
+const enableTypeScript = fs.existsSync(tsconfigJsonFile);
 
 // Target flow-fronted auto generated to be the actual target folder
-const flowFrontendFolder = path.resolve(__dirname, 'target/flow-frontend');
-
-// make sure that build folder exists before outputting anything
-const mkdirp = require('mkdirp');
+const flowFrontendFolder = path.resolve(__dirname, 'build/flow-frontend');
 
 const devMode = process.argv.find(v => v.indexOf('webpack-dev-server') >= 0);
 if (!devMode) {
@@ -86,10 +86,8 @@ let stats;
 
 // Open a connection with the Java dev-mode handler in order to finish
 // webpack-dev-mode when it exits or crashes.
-const watchDogPrefix = '--watchDogPort=';
-let watchDogPort = devMode && process.argv.find(v => v.indexOf(watchDogPrefix) >= 0);
+const watchDogPort = devMode && process.env.watchDogPort;
 if (watchDogPort) {
-  watchDogPort = watchDogPort.substr(watchDogPrefix.length);
   const runWatchDog = () => {
     const client = new require('net').Socket();
     client.setEncoding('utf8');
@@ -128,50 +126,51 @@ let appShellManifestEntry = undefined;
 const swManifestTransform = (manifestEntries) => {
   const warnings = [];
   const manifest = manifestEntries;
-
-  // `index.html` is a special case: in contrast with the JS bundles produced by webpack
-  // it's not served as-is directly from the webpack output at `/index.html`.
-  // It goes through IndexHtmlRequestHandler and is served at `/`.
-  //
-  // TODO: calculate the revision based on the IndexHtmlRequestHandler-processed content
-  // of the index.html file
-  const indexEntryIdx = manifest.findIndex(entry => entry.url === 'index.html');
-  if (indexEntryIdx !== -1) {
-    manifest[indexEntryIdx].url = appShellUrl;
-    appShellManifestEntry = manifest[indexEntryIdx];
-  } else {
-    // Index entry is only emitted on first compilation. Make sure it is cached also for incremental builds
-    manifest.push(appShellManifestEntry);
+  if (useClientSideIndexFileForBootstrapping) {
+    // `index.html` is a special case: in contrast with the JS bundles produced by webpack
+    // it's not served as-is directly from the webpack output at `/index.html`.
+    // It goes through IndexHtmlRequestHandler and is served at `/`.
+    //
+    // TODO: calculate the revision based on the IndexHtmlRequestHandler-processed content
+    // of the index.html file
+    const indexEntryIdx = manifest.findIndex(entry => entry.url === 'index.html');
+    if (indexEntryIdx !== -1) {
+      manifest[indexEntryIdx].url = appShellUrl;
+      appShellManifestEntry = manifest[indexEntryIdx];
+    } else {
+      // Index entry is only emitted on first compilation. Make sure it is cached also for incremental builds
+      manifest.push(appShellManifestEntry);
+    }
   }
-
   return { manifest, warnings };
 };
 
-const serviceWorkerPlugin = new InjectManifest({
-  swSrc: clientServiceWorkerEntryPoint,
-  swDest: serviceWorkerPath,
-  manifestTransforms: [swManifestTransform],
-  maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
-  dontCacheBustURLsMatching: /.*-[a-z0-9]{20}\.cache\.js/,
-  include: [
-    (chunk) => {
-      return true;
-    },
-  ],
-  webpackCompilationPlugins: [
-    new DefinePlugin({
-      OFFLINE_PATH_ENABLED: offlinePathEnabled,
-      OFFLINE_PATH: JSON.stringify(offlinePath)
-    }),
-  ],
-});
+const createServiceWorkerPlugin = function() {
+  return new InjectManifest({
+    swSrc: clientServiceWorkerEntryPoint,
+    swDest: serviceWorkerPath,
+    manifestTransforms: [swManifestTransform],
+    maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
+    dontCacheBustURLsMatching: /.*-[a-z0-9]{20}\.cache\.js/,
+    include: [
+      (chunk) => {
+        return true;
+      },
+    ],
+    webpackCompilationPlugins: [
+      new DefinePlugin({
+        OFFLINE_PATH_ENABLED: offlinePathEnabled,
+        OFFLINE_PATH: JSON.stringify(offlinePath)
+      }),
+    ],
+  });
+}
 
 if (devMode) {
   webPackEntries.devmodeGizmo = devmodeGizmoJS;
 }
 
 const flowFrontendThemesFolder = path.resolve(flowFrontendFolder, 'themes');
-const themeName = extractThemeName(flowFrontendThemesFolder);
 const themeOptions = {
   devMode: devMode,
   // The following matches folder 'target/flow-frontend/themes/'
@@ -181,6 +180,23 @@ const themeOptions = {
   projectStaticAssetsOutputFolder: projectStaticAssetsOutputFolder,
   frontendGeneratedFolder: frontendGeneratedFolder
 };
+let themeName = undefined;
+let themeWatchFolders = undefined;
+if (devMode) {
+  // Current theme name is being extracted from theme.js located in frontend
+  // generated folder
+  themeName = extractThemeName(frontendGeneratedFolder);
+  const parentThemePaths = findParentThemes(themeName, themeOptions);
+  const currentThemeFolders = projectStaticAssetsFolders
+    .map((folder) => path.resolve(folder, "themes", themeName));
+  // Watch the components folders for component styles update in both
+  // current theme and parent themes. Other folders or CSS files except
+  // 'styles.css' should be referenced from `styles.css` anyway, so no need
+  // to watch them.
+  themeWatchFolders = [...currentThemeFolders, ...parentThemePaths]
+    .map((themeFolder) => path.resolve(themeFolder, "components"));
+}
+
 const processThemeResourcesCallback = (logger) => processThemeResources(themeOptions, logger);
 
 exports = {
@@ -207,7 +223,7 @@ module.exports = {
       ...projectStaticAssetsFolders,
     ],
     extensions: [
-      useClientSideIndexFileForBootstrapping && '.ts',
+      enableTypeScript && '.ts',
       '.js'
     ].filter(Boolean),
     alias: {
@@ -238,9 +254,13 @@ module.exports = {
 
   module: {
     rules: [
-      useClientSideIndexFileForBootstrapping && {
+      enableTypeScript && {
         test: /\.ts$/,
-        loader: 'ts-loader'
+        loader: 'ts-loader',
+        options: {
+          transpileOnly: true,
+          experimentalWatchApi: true
+        }
       },
       {
         test: /\.css$/i,
@@ -305,14 +325,10 @@ module.exports = {
 
     new ApplicationThemePlugin(themeOptions),
 
-    devMode && themeName && new ExtraWatchWebpackPlugin({
+    ...(devMode && themeName ? [new ExtraWatchWebpackPlugin({
       files: [],
-      dirs: [path.resolve(__dirname, 'frontend', 'themes', themeName),
-        path.resolve(__dirname, 'src', 'main', 'resources', 'META-INF', 'resources', 'themes', themeName),
-        path.resolve(__dirname, 'src', 'main', 'resources', 'static', 'themes', themeName)]
-    }),
-
-    devMode && themeName && new ThemeLiveReloadPlugin(themeName, processThemeResourcesCallback),
+      dirs: [...themeWatchFolders]
+    }), new ThemeLiveReloadPlugin(processThemeResourcesCallback)] : []),
 
     new StatsPlugin({
       devMode: devMode,
@@ -332,9 +348,15 @@ module.exports = {
     }),
 
     // Service worker for offline
-    pwaEnabled && serviceWorkerPlugin,
+    pwaEnabled && createServiceWorkerPlugin(),
 
     // Generate compressed bundles when not devMode
     !devMode && new CompressionPlugin(),
+
+    enableTypeScript && new ForkTsCheckerWebpackPlugin({
+      typescript: {
+        configFile: tsconfigJsonFile
+      }
+    }),
   ].filter(Boolean)
 };

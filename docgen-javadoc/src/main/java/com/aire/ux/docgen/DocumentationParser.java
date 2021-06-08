@@ -1,7 +1,7 @@
 package com.aire.ux.docgen;
 
-import com.aire.ux.docgen.ast.AbstractSyntaxTree;
-import com.aire.ux.docgen.ast.SyntaxNode;
+import com.aire.ux.parsers.ast.AbstractSyntaxTree;
+import com.aire.ux.parsers.ast.SyntaxNode;
 import com.sun.source.doctree.DocCommentTree;
 import com.sun.source.doctree.DocTree;
 import com.sun.source.doctree.UnknownBlockTagTree;
