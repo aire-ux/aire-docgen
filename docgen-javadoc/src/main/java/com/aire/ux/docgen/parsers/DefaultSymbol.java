@@ -1,10 +1,13 @@
 package com.aire.ux.docgen.parsers;
 
 import com.aire.ux.parsers.ast.Symbol;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import lombok.Data;
 
-@SuppressFBWarnings
-public record DefaultSymbol(String name) implements Symbol {
+@Data
+public class DefaultSymbol implements Symbol {
+
+  final String name;
+
   @Override
   public String toString() {
     return name;

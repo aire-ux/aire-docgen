@@ -1,19 +1,19 @@
 package com.aire.ux.docgen;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Locale;
-import java.util.Set;
 import javax.lang.model.SourceVersion;
 import javax.tools.JavaFileObject;
 import jdk.javadoc.doclet.Doclet;
 import jdk.javadoc.doclet.DocletEnvironment;
 import jdk.javadoc.doclet.Reporter;
+import jdk.javadoc.doclet.StandardDoclet;
 import lombok.val;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AireDoclet implements Doclet {
+public class AireDoclet extends StandardDoclet implements Doclet {
 
   static final Logger log = LogManager.getLogger(AireDoclet.class);
   static final Object filesLock = new Object();
@@ -21,6 +21,7 @@ public class AireDoclet implements Doclet {
 
   static {
     files = new ThreadLocal<>();
+    AireDocumentationManager.reload();
   }
 
   private Locale locale;
@@ -56,7 +57,9 @@ public class AireDoclet implements Doclet {
 
   @Override
   public void init(Locale locale, Reporter reporter) {
-    log.info("Initializing AireDoclet with (locale: {}, reporter: {})", locale, reporter);
+    log.log(
+        Level.INFO, "Initializing AireDoclet with (locale: {}, reporter: {})", locale, reporter);
+
     this.locale = locale;
     this.reporter = reporter;
     AireDocumentationManager.pushContext(context = createContext());
@@ -70,11 +73,6 @@ public class AireDoclet implements Doclet {
   @Override
   public String getName() {
     return AireDoclet.class.getSimpleName();
-  }
-
-  @Override
-  public Set<? extends Option> getSupportedOptions() {
-    return Collections.emptySet();
   }
 
   @Override

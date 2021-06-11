@@ -26,7 +26,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
-public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode> {
+public class DocumentationParser
+    extends ElementScanner9<SyntaxNode<DocTree, Element>, SyntaxNode<DocTree, Element>> {
 
   static final Logger log = LogManager.getLogger(DocumentationParser.class);
   static final List<Parser> parsers;
@@ -36,11 +37,11 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
   }
 
   private final Reporter reporter;
-  private final Stack<SyntaxNode> nodes;
   private final DocTrees documentForest;
   private final DocletEnvironment environment;
   private final Map<Element, Boolean> visited;
   private final Map<ElementKind, Parser> parserCache;
+  private final Stack<SyntaxNode<DocTree, Element>> nodes;
 
   public DocumentationParser(DocTrees docTrees, DocletEnvironment environment, Reporter reporter) {
     this.reporter = reporter;
@@ -59,14 +60,14 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
   }
 
   public AbstractSyntaxTree process(Set<? extends Element> elements) {
-    val result = new AbstractSyntaxTree();
+    val result = new AbstractSyntaxTree<DocTree, Element>();
     scan(elements, result.getRoot());
     return result;
   }
 
   @SuppressFBWarnings
-  public SyntaxNode scan(Element e, SyntaxNode parent) {
-    SyntaxNode pnode = parent;
+  public SyntaxNode<DocTree, Element> scan(Element e, SyntaxNode<DocTree, Element> parent) {
+    SyntaxNode<DocTree, Element> pnode = parent;
     if (!visited(e)) {
       val tree = documentForest.getDocCommentTree(e);
       if (e != null) {
@@ -96,21 +97,21 @@ public class DocumentationParser extends ElementScanner9<SyntaxNode, SyntaxNode>
     return result != null && result;
   }
 
-  final class TagVisitor extends SimpleDocTreeVisitor<SyntaxNode, Void> {
+  final class TagVisitor extends SimpleDocTreeVisitor<SyntaxNode<DocTree, Element>, Void> {
 
     final SyntaxNode node;
     final Element element;
 
-    TagVisitor(@Nonnull final SyntaxNode node, @Nonnull Element element) {
+    TagVisitor(@Nonnull final SyntaxNode<DocTree, Element> node, @Nonnull Element element) {
       this.node = node;
       this.element = element;
     }
 
-    public SyntaxNode visitDocComment(DocCommentTree tree, Void p) {
+    public SyntaxNode<DocTree, Element> visitDocComment(DocCommentTree tree, Void p) {
       return visit(tree.getBlockTags(), null);
     }
 
-    public SyntaxNode visitUnknownBlockTag(UnknownBlockTagTree tree, Void p) {
+    public SyntaxNode<DocTree, Element> visitUnknownBlockTag(UnknownBlockTagTree tree, Void p) {
       val parser = lookupAndCache(element, tree);
       if (parser != null) {
         val blockSyntaxNode = parser.parse(element, tree);

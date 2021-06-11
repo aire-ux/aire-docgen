@@ -24,12 +24,12 @@ public class PropertyParser implements Parser {
   }
 
   @Override
-  public SyntaxNode parse(@Nonnull Element element, DocTree tree) {
+  public SyntaxNode<DocTree, Element> parse(@Nonnull Element element, DocTree tree) {
     val variable = (VariableElement) element;
     val name = variable.getSimpleName().toString();
     val type = variable.asType().toString();
     val node =
-        new NamedSyntaxNode(
+        new NamedSyntaxNode<>(
             name,
             PropertySymbol,
             element,

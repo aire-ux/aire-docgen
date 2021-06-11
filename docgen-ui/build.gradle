@@ -1,58 +1,93 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.4'
-	id 'io.spring.dependency-management'
-	id 'java'
-	id 'com.vaadin' version '20.0.1'
-	id "io.freefair.jsass-war" version "6.0.0-m2"
-	id 'io.miret.etienne.sass' version '1.1.1'
+    id 'org.springframework.boot' version '2.4.4'
+    id 'io.spring.dependency-management'
+    id 'java'
+    id 'com.vaadin' version '20.0.1'
+    id 'io.miret.etienne.sass' version '1.1.1'
 
 }
 
-defaultTasks("clean", "build")
+defaultTasks("clean", "build", "bootJar")
 
-//sourceCompatibility = '1.8'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 configurations {
-	developmentOnly
-	runtimeClasspath {
-		extendsFrom developmentOnly
-	}
+    aireDocs {
+        transitive false
+    }
+
+    developmentOnly
+
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+jar {
+    enabled = true
+}
+
+bootJar {
+    archiveClassifier = 'application'
 }
 
 compileSass {
-	watch()
-	sourceDir = file("$projectDir/src/main/styles/")
-	outputDir = file("$projectDir/frontend/styles/")
+    watch()
+    sourceDir = file("$projectDir/src/main/styles/")
+    outputDir = file("$projectDir/frontend/styles/")
 }
 
 dependencies {
-	implementation('com.vaadin:vaadin-spring-boot-starter') {
-//         Webjars are only needed when running in Vaadin 13 compatibility mode
-		["com.vaadin.webjar", "org.webjars.bowergithub.insites",
-		 "org.webjars.bowergithub.polymer", "org.webjars.bowergithub.polymerelements",
-		 "org.webjars.bowergithub.vaadin", "org.webjars.bowergithub.webcomponents"]
-				.forEach { group -> exclude(group: group) }
-	}
+
+    aireDocs project(':docgen-javadoc')
+    aireDocs 'com.aire-ux.components:aire-css-selectors:1.0.10.Final'
+    aireDocs 'org.apache.logging.log4j:log4j-api:2.14.1'
+    aireDocs 'org.apache.logging.log4j:log4j-core:2.14.1'
+    aireDocs group: 'io.timeandspace', name: 'smoothie-map', version: '2.0.2'
+
+    implementation('com.vaadin:vaadin-spring-boot-starter') {
+        [
+                "com.vaadin.webjar",
+                "org.webjars.bowergithub.insites",
+                "org.webjars.bowergithub.polymer",
+                "org.webjars.bowergithub.polymerelements",
+                "org.webjars.bowergithub.vaadin",
+                "org.webjars.bowergithub.webcomponents"
+        ].forEach { group ->
+            exclude(group: group)
+        }
+    }
+
+
 //	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	testImplementation('org.springframework.boot:spring-boot-starter-test') {
-		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-	}
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+}
+
+task generateAireDocs(type: Javadoc) {
+    options.source = '11'
+    source = sourceSets.main.allJava
+
+    options.classpath = configurations.runtimeClasspath.files.asType(List)
+
+    options.doclet = 'com.aire.ux.docgen.AireDoclet'
+    options.docletpath = configurations.aireDocs.files.asType(List)
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
-	}
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+    }
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 vaadin {
-	pnpmEnable = false
+    pnpmEnable = false
 }

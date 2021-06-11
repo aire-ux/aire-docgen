@@ -28,12 +28,13 @@ public class ComponentElementParser implements Parser {
   }
 
   @Override
-  public SyntaxNode parse(@Nonnull Element element, @Nonnull DocTree tree) {
+  public SyntaxNode<DocTree, Element> parse(@Nonnull Element element, @Nonnull DocTree tree) {
     val name = element.getSimpleName().toString();
     val toRemove = new HashSet<DocTree>();
     val children = new CodeNodeVisitor(element).visit(tree, toRemove);
     val content = rewrite(toRemove, (UnknownBlockTagTree) tree);
-    return new NamedSyntaxNode(name, ComponentElement, element, tree, content, children);
+    return new NamedSyntaxNode<DocTree, Element>(
+        name, ComponentElement, element, tree, content, children);
   }
 
   private String rewrite(HashSet<DocTree> toRemove, UnknownBlockTagTree tree) {
@@ -42,7 +43,7 @@ public class ComponentElementParser implements Parser {
     while (iter.hasNext()) {
       val child = iter.next();
       if (!toRemove.contains(child) && child.getKind() == Kind.TEXT) {
-        textualContent.append(child.toString());
+        textualContent.append(child);
       }
     }
     return textualContent.toString();

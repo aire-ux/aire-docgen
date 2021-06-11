@@ -1,5 +1,7 @@
 package com.aire.ux.docgen;
 
+import static java.lang.String.format;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -59,8 +61,9 @@ public class AireDocumentationManager {
     val ctx = pendingContexts.get().pop();
     if (!Objects.equals(ctx, context)) {
       throw new AireDocumentationException(
-          "Error (probably concurrency-related): documentation context '%s' is not the expected one '%s'"
-              .formatted(ctx, context));
+          format(
+              "Error (probably concurrency-related): documentation context '%s' is not the expected one '%s'",
+              ctx, context));
     }
     processingContext.set(ctx);
   }
@@ -69,9 +72,10 @@ public class AireDocumentationManager {
     pendingContexts.get().push(processingContext);
   }
 
-  private static void reload() {
+  static void reload() {
     log.info("Loading component parsers...");
-    val serviceLoader = ServiceLoader.load(Parser.class);
+    val serviceLoader =
+        ServiceLoader.load(Parser.class, Thread.currentThread().getContextClassLoader());
     for (val service : serviceLoader) {
       DocumentationParser.register(service);
     }

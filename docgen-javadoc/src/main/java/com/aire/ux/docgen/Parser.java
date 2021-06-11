@@ -10,5 +10,5 @@ public interface Parser {
 
   boolean appliesTo(@Nonnull Element element, @Nullable DocTree tree);
 
-  SyntaxNode parse(@Nonnull Element element, @Nullable DocTree tree);
+  SyntaxNode<DocTree, Element> parse(@Nonnull Element element, @Nullable DocTree tree);
 }

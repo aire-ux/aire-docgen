@@ -17,11 +17,12 @@ import java.util.Stack;
 import javax.lang.model.element.Element;
 import lombok.val;
 
-public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<DocTree>> {
+public class CodeNodeVisitor
+    extends SimpleDocTreeVisitor<List<SyntaxNode<DocTree, Element>>, Set<DocTree>> {
 
   private final Element element;
-  private final Stack<SyntaxNode> nodes;
   private final Stack<String> textualContent;
+  private final Stack<SyntaxNode<DocTree, Element>> nodes;
 
   CodeNodeVisitor(final Element element) {
     this.element = element;
@@ -30,7 +31,7 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
   }
 
   @Override
-  public List<SyntaxNode> visitText(TextTree node, Set<DocTree> unused) {
+  public List<SyntaxNode<DocTree, Element>> visitText(TextTree node, Set<DocTree> unused) {
     if (!nodes.isEmpty()) {
       val codeNode = nodes.peek();
       val content = codeNode.getContent();
@@ -45,7 +46,8 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
   }
 
   @Override
-  public List<SyntaxNode> visitAttribute(AttributeTree node, Set<DocTree> docTrees) {
+  public List<SyntaxNode<DocTree, Element>> visitAttribute(
+      AttributeTree node, Set<DocTree> docTrees) {
     val name = node.getName().toString();
     if ("lang".equals(name)) {
       textualContent.push(node.getValue().get(0).toString());
@@ -54,7 +56,8 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
   }
 
   @Override
-  public List<SyntaxNode> visitStartElement(StartElementTree node, Set<DocTree> toRemove) {
+  public List<SyntaxNode<DocTree, Element>> visitStartElement(
+      StartElementTree node, Set<DocTree> toRemove) {
     val name = node.getName().toString();
     if ("code".equals(name)) {
       toRemove.add(node);
@@ -65,14 +68,16 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
       val language = textualContent.pop();
 
       val codeNode =
-          new NamedSyntaxNode(language, ComponentElementParser.CodeElement, element, node);
+          new NamedSyntaxNode<DocTree, Element>(
+              language, ComponentElementParser.CodeElement, element, node);
       nodes.push(codeNode);
     }
     return null;
   }
 
   @Override
-  public List<SyntaxNode> visitEndElement(EndElementTree node, Set<DocTree> unused) {
+  public List<SyntaxNode<DocTree, Element>> visitEndElement(
+      EndElementTree node, Set<DocTree> unused) {
     if (!nodes.isEmpty()) {
       val result = nodes.pop();
       unused.add(node);
@@ -82,8 +87,9 @@ public class CodeNodeVisitor extends SimpleDocTreeVisitor<List<SyntaxNode>, Set<
   }
 
   @Override
-  public List<SyntaxNode> visitUnknownBlockTag(UnknownBlockTagTree node, Set<DocTree> unused) {
-    val result = new ArrayList<SyntaxNode>();
+  public List<SyntaxNode<DocTree, Element>> visitUnknownBlockTag(
+      UnknownBlockTagTree node, Set<DocTree> unused) {
+    val result = new ArrayList<SyntaxNode<DocTree, Element>>();
     for (val c : node.getContent()) {
       val cr = super.visit(c, unused);
       if (cr != null) {
