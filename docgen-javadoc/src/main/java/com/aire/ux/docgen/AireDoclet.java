@@ -3,13 +3,14 @@ package com.aire.ux.docgen;
 import static java.lang.String.format;
 
 import com.aire.ux.docgen.ast.SyntaxTreeRewriteRule;
+import com.aire.ux.docgen.emitters.Emitter;
 import com.aire.ux.parsers.ast.AbstractSyntaxTree;
-import com.aire.ux.parsers.ast.RewriteRule;
 import com.sun.source.doctree.DocTree;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
 import java.util.Set;
 import javax.lang.model.SourceVersion;
@@ -27,6 +28,7 @@ public class AireDoclet implements Doclet {
 
   static final Logger log = LogManager.getLogger(AireDoclet.class);
   static final Object filesLock = new Object();
+  static final String ANY_FORMAT = "any";
   private static final ThreadLocal<Collection<JavaFileObject>> files;
 
   static {
@@ -34,6 +36,7 @@ public class AireDoclet implements Doclet {
     AireDocumentationManager.reload();
   }
 
+  private String format;
   private Locale locale;
   private Reporter reporter;
   private File outputDirectory;
@@ -92,7 +95,6 @@ public class AireDoclet implements Doclet {
   public Set<? extends Doclet.Option> getSupportedOptions() {
     return Set.of(
         new Option("-d", true, "output parsed documentation to this directory", null) {
-
           @Override
           public boolean process(String option, List<String> arguments) {
             if (arguments == null || arguments.isEmpty()) {
@@ -105,7 +107,20 @@ public class AireDoclet implements Doclet {
             AireDoclet.this.setOutputDirectory(arguments.get(0));
             return true;
           }
-        });
+        },
+        new Option("--format", true, "write documentation in this format", null) {
+          @Override
+          public boolean process(String option, List<String> arguments) {
+            if (arguments == null || arguments.isEmpty()) {
+              log.info("No format specified.  Writing to first available formatter");
+              AireDoclet.this.setFormat("any");
+              return true;
+            }
+            AireDoclet.this.setFormat(arguments.get(0));
+            return true;
+          }
+        }
+    );
   }
 
   private void setOutputDirectory(String s) {
@@ -113,6 +128,11 @@ public class AireDoclet implements Doclet {
     this.outputDirectory = validate(s);
   }
 
+
+  private void setFormat(String format) {
+    log.info("Requested format '{}'", format);
+    this.format = format;
+  }
 
   @Override
   public SourceVersion getSupportedSourceVersion() {
@@ -132,15 +152,62 @@ public class AireDoclet implements Doclet {
     return true;
   }
 
-  private void write(AbstractSyntaxTree<DocTree, Element> rewrite) {}
+  private void write(AbstractSyntaxTree<DocTree, Element> rewrite) {
+    if(format == null) {
+      log.info("No format requested, not emitting any documentation");
+      return;
+    }
+    val emitter = lookupEmitter();
+    val localeDirectory = new File(outputDirectory, locale.toString());
+    if (!(localeDirectory.exists() || localeDirectory.mkdirs())) {
+      throw new IllegalStateException(
+          format("Error: failed to create directory '%s' and it does not exist", localeDirectory));
+    }
+    emitter.emit(rewrite, new File(localeDirectory, format("aire.%s", format)));
+  }
+
+  private Emitter lookupEmitter() {
+    for (val emitter : ServiceLoader.load(Emitter.class, Thread.currentThread()
+        .getContextClassLoader())) {
+      if (format == null || ANY_FORMAT.equalsIgnoreCase(format)) {
+        return emitter;
+      }
+
+      if (emitter.appliesTo(format)) {
+        log.info("Located emitter '{}' for format '{}'", emitter, format);
+        return emitter;
+      }
+    }
+    throw new NoSuchElementException(format("No emitter for format '%s'", format));
+  }
 
   @SuppressWarnings("unchecked")
   private AbstractSyntaxTree<DocTree, Element> rewrite(AbstractSyntaxTree<DocTree, Element> tree) {
     for (val rewriteRule :
-        ServiceLoader.load(SyntaxTreeRewriteRule.class, Thread.currentThread().getContextClassLoader())) {
+        ServiceLoader
+            .load(SyntaxTreeRewriteRule.class, Thread.currentThread().getContextClassLoader())) {
       tree = rewriteRule.rewrite(tree);
     }
     return tree;
+  }
+
+  private File validate(String s) {
+    val file = new File(s);
+    if (file.exists() && !file.isDirectory()) {
+      throw new IllegalArgumentException(
+          format("File '%s' exists, but is not a directory", file.getAbsolutePath()));
+    }
+
+    if (!file.exists()) {
+      log.info("Directory ''{}'' does not exist--attempting to create it", file);
+      if (!file.mkdirs()) {
+        throw new IllegalStateException(
+            format(
+                "Error: could not create directory '%s' and it does not exist.  Not continuing",
+                file));
+      }
+    }
+    return file;
   }
 
   abstract static class Option implements Doclet.Option {
@@ -181,24 +248,5 @@ public class AireDoclet implements Doclet {
     public String getParameters() {
       return hasArg ? parameters : "";
     }
-  }
-
-  private File validate(String s) {
-    val file = new File(s);
-    if (file.exists() && !file.isDirectory()) {
-      throw new IllegalArgumentException(
-          format("File '%s' exists, but is not a directory", file.getAbsolutePath()));
-    }
-
-    if (!file.exists()) {
-      log.info("Directory ''{}'' does not exist--attempting to create it", file);
-      if (!file.mkdirs()) {
-        throw new IllegalStateException(
-            format(
-                "Error: could not create directory '%s' and it does not exist.  Not continuing",
-                file));
-      }
-    }
-    return file;
   }
 }

@@ -7,6 +7,7 @@ import com.aire.ux.parsers.ast.SyntaxNode;
 import com.sun.source.doctree.DocTree;
 import com.sun.source.doctree.DocTree.Kind;
 import com.sun.source.doctree.UnknownBlockTagTree;
+import java.util.HashSet;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.lang.model.element.Element;
@@ -28,14 +29,22 @@ public class PropertyParser implements Parser {
     val variable = (VariableElement) element;
     val name = variable.getSimpleName().toString();
     val type = variable.asType().toString();
+
+    val toRemove = new HashSet<DocTree>();
+    val children = new CodeNodeVisitor(element).visit(tree, toRemove);
+    val content = ComponentElementParser.rewrite(toRemove, (UnknownBlockTagTree) tree);
+
     val node =
         new NamedSyntaxNode<>(
             name,
             PropertySymbol,
             element,
             tree,
-            Parsing.extractTextNodes(((UnknownBlockTagTree) tree).getContent()));
+            content);
     node.setProperty("type", type);
+    node.setChildren(children);
     return node;
   }
+
+
 }

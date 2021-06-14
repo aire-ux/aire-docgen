@@ -17,15 +17,17 @@ import lombok.val;
 
 public class ComponentElementParser implements Parser {
 
-  @SuppressFBWarnings public static final Symbol CodeElement = new DefaultSymbol("code");
-  @SuppressFBWarnings public static final Symbol ComponentElement = new DefaultSymbol("component");
+  @SuppressFBWarnings
+  public static final Symbol CodeElement = new DefaultSymbol("code");
+  @SuppressFBWarnings
+  public static final Symbol ComponentElement = new DefaultSymbol("component");
 
   @Override
   public boolean appliesTo(@Nonnull Element element, DocTree tree) {
     return element.getKind() == ElementKind.CLASS
-        && tree != null
-        && tree.getKind() == Kind.UNKNOWN_BLOCK_TAG
-        && ((UnknownBlockTagTree) tree).getTagName().equals("component");
+           && tree != null
+           && tree.getKind() == Kind.UNKNOWN_BLOCK_TAG
+           && ((UnknownBlockTagTree) tree).getTagName().equals("component");
   }
 
   @Override
@@ -34,11 +36,22 @@ public class ComponentElementParser implements Parser {
     val toRemove = new HashSet<DocTree>();
     val children = new CodeNodeVisitor(element).visit(tree, toRemove);
     val content = rewrite(toRemove, (UnknownBlockTagTree) tree);
-    return new NamedSyntaxNode<>(
+
+    val node = new NamedSyntaxNode<>(
         name, ComponentElement, element, tree, content, children, new LinkedHashMap<>());
+    setPackage(node, element);
+    return node;
   }
 
-  private String rewrite(HashSet<DocTree> toRemove, UnknownBlockTagTree tree) {
+  private void setPackage(NamedSyntaxNode<DocTree, Element> node, Element element) {
+    for (var enclosing = element; enclosing != null; enclosing = enclosing.getEnclosingElement()) {
+      if (enclosing.getKind() == ElementKind.PACKAGE) {
+        node.setProperty("package", enclosing.toString());
+      }
+    }
+  }
+
+  static String rewrite(HashSet<DocTree> toRemove, UnknownBlockTagTree tree) {
     val iter = tree.getContent().iterator();
     val textualContent = new StringBuilder();
     while (iter.hasNext()) {
