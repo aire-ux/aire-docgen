@@ -9,6 +9,7 @@ import com.sun.source.doctree.DocTree.Kind;
 import com.sun.source.doctree.UnknownBlockTagTree;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -33,8 +34,8 @@ public class ComponentElementParser implements Parser {
     val toRemove = new HashSet<DocTree>();
     val children = new CodeNodeVisitor(element).visit(tree, toRemove);
     val content = rewrite(toRemove, (UnknownBlockTagTree) tree);
-    return new NamedSyntaxNode<DocTree, Element>(
-        name, ComponentElement, element, tree, content, children);
+    return new NamedSyntaxNode<>(
+        name, ComponentElement, element, tree, content, children, new LinkedHashMap<>());
   }
 
   private String rewrite(HashSet<DocTree> toRemove, UnknownBlockTagTree tree) {

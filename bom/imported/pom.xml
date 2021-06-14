@@ -28,7 +28,7 @@
     <spring-boot.version>2.4.4</spring-boot.version>
     <vaadin-helper.version>1.6.0</vaadin-helper.version>
     <byte-buddy.version>1.10.22</byte-buddy.version>
-    <aire-ux.version>1.0.10.Final</aire-ux.version>
+    <aire-ux.version>1.0.15.Final</aire-ux.version>
   </properties>
 
   <dependencyManagement>

@@ -1,19 +1,29 @@
 package com.aire.ux.docgen;
 
+import static java.lang.String.format;
+
+import com.aire.ux.docgen.ast.SyntaxTreeRewriteRule;
+import com.aire.ux.parsers.ast.AbstractSyntaxTree;
+import com.aire.ux.parsers.ast.RewriteRule;
+import com.sun.source.doctree.DocTree;
+import java.io.File;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
+import java.util.ServiceLoader;
+import java.util.Set;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.tools.JavaFileObject;
 import jdk.javadoc.doclet.Doclet;
 import jdk.javadoc.doclet.DocletEnvironment;
 import jdk.javadoc.doclet.Reporter;
-import jdk.javadoc.doclet.StandardDoclet;
 import lombok.val;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AireDoclet extends StandardDoclet implements Doclet {
+public class AireDoclet implements Doclet {
 
   static final Logger log = LogManager.getLogger(AireDoclet.class);
   static final Object filesLock = new Object();
@@ -26,9 +36,12 @@ public class AireDoclet extends StandardDoclet implements Doclet {
 
   private Locale locale;
   private Reporter reporter;
+  private File outputDirectory;
   private ProcessingContext context;
 
-  public AireDoclet() {}
+  public AireDoclet() {
+    super();
+  }
 
   public static void setFiles(Collection<JavaFileObject> files) {
     synchronized (filesLock) {
@@ -76,6 +89,32 @@ public class AireDoclet extends StandardDoclet implements Doclet {
   }
 
   @Override
+  public Set<? extends Doclet.Option> getSupportedOptions() {
+    return Set.of(
+        new Option("-d", true, "output parsed documentation to this directory", null) {
+
+          @Override
+          public boolean process(String option, List<String> arguments) {
+            if (arguments == null || arguments.isEmpty()) {
+              log.warn(
+                  "No output directory specified, defaulting to process current directory ({})",
+                  System.getProperty("user.dir"));
+              AireDoclet.this.setOutputDirectory(System.getProperty("user.dir"));
+              return true;
+            }
+            AireDoclet.this.setOutputDirectory(arguments.get(0));
+            return true;
+          }
+        });
+  }
+
+  private void setOutputDirectory(String s) {
+    log.info("Using output directory '{}'", s);
+    this.outputDirectory = validate(s);
+  }
+
+
+  @Override
   public SourceVersion getSupportedSourceVersion() {
     return SourceVersion.latestSupported();
   }
@@ -86,9 +125,80 @@ public class AireDoclet extends StandardDoclet implements Doclet {
     val docTrees = environment.getDocTrees();
     val parser = new DocumentationParser(docTrees, environment, reporter);
     val elements = environment.getIncludedElements();
-    val syntaxTree = parser.process(elements);
+    val syntaxTree = rewrite(parser.process(elements));
     context.setSyntaxTree(syntaxTree);
     AireDocumentationManager.popContext(context);
+    write(syntaxTree);
     return true;
+  }
+
+  private void write(AbstractSyntaxTree<DocTree, Element> rewrite) {}
+
+  @SuppressWarnings("unchecked")
+  private AbstractSyntaxTree<DocTree, Element> rewrite(AbstractSyntaxTree<DocTree, Element> tree) {
+    for (val rewriteRule :
+        ServiceLoader.load(SyntaxTreeRewriteRule.class, Thread.currentThread().getContextClassLoader())) {
+      tree = rewriteRule.rewrite(tree);
+    }
+    return tree;
+  }
+
+  abstract static class Option implements Doclet.Option {
+
+    private final String name;
+    private final boolean hasArg;
+    private final String description;
+    private final String parameters;
+
+    Option(String name, boolean hasArg, String description, String parameters) {
+      this.name = name;
+      this.hasArg = hasArg;
+      this.description = description;
+      this.parameters = parameters;
+    }
+
+    @Override
+    public int getArgumentCount() {
+      return hasArg ? 1 : 0;
+    }
+
+    @Override
+    public String getDescription() {
+      return description;
+    }
+
+    @Override
+    public Kind getKind() {
+      return Kind.STANDARD;
+    }
+
+    @Override
+    public List<String> getNames() {
+      return List.of(name);
+    }
+
+    @Override
+    public String getParameters() {
+      return hasArg ? parameters : "";
+    }
+  }
+
+  private File validate(String s) {
+    val file = new File(s);
+    if (file.exists() && !file.isDirectory()) {
+      throw new IllegalArgumentException(
+          format("File '%s' exists, but is not a directory", file.getAbsolutePath()));
+    }
+
+    if (!file.exists()) {
+      log.info("Directory ''{}'' does not exist--attempting to create it", file);
+      if (!file.mkdirs()) {
+        throw new IllegalStateException(
+            format(
+                "Error: could not create directory '%s' and it does not exist.  Not continuing",
+                file));
+      }
+    }
+    return file;
   }
 }

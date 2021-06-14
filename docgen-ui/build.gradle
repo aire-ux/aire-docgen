@@ -91,3 +91,7 @@ test {
 vaadin {
     pnpmEnable = false
 }
+
+javadoc {
+    options.jFlags 'Xdoclint:none'
+}

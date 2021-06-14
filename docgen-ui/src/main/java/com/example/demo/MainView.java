@@ -9,16 +9,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
 /**
- *
  * @group Layouts
- * @component
- * MainView
- *
- * <code lang="groovy">
+ * @component MainView <code lang="groovy">
  * </code>
- *
  * @property name hello
- *
  */
 @Route("")
 @PWA(name = "Project Base for Vaadin", shortName = "Project Base")

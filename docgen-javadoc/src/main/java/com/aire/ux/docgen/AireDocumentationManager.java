@@ -3,6 +3,7 @@ package com.aire.ux.docgen;
 import static java.lang.String.format;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.sunshower.lang.tuple.Pair;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URI;
@@ -36,18 +37,22 @@ public class AireDocumentationManager {
     processingContext = new ThreadLocal<>();
   }
 
-  public static ProcessingContext parse(final Collection<JavaFileObject> paths) {
-    return parse(new PrintWriter(System.out, true, StandardCharsets.UTF_8), paths);
+  public static ProcessingContext parse(final Collection<JavaFileObject> paths, Pair<String, String>...args) {
+    return parse(new PrintWriter(System.out, true, StandardCharsets.UTF_8), paths, args);
   }
 
   public static ProcessingContext parse(
-      final Writer writer, final Collection<JavaFileObject> paths) {
+      final Writer writer, final Collection<JavaFileObject> paths, Pair<String, String>... args) {
     reload();
     AireDoclet.setFiles(paths);
+    val arguments =
+        Arrays.stream(args).flatMap(t -> List.of(t.fst, t.snd).stream())
+            .collect(Collectors.toList());
+    arguments.addAll(List.of("--show-members", "private"));
     val tool =
         ToolProvider.getSystemDocumentationTool()
             .getTask(
-                writer, null, null, AireDoclet.class, List.of("--show-members", "private"), paths);
+                writer, null, null, AireDoclet.class, arguments, paths);
     tool.call();
     val current = processingContext.get();
     if (current == null) {
@@ -94,8 +99,8 @@ public class AireDocumentationManager {
   }
 
   @SuppressFBWarnings
-  public static ProcessingContext parse(URI uri, String contents) {
+  public static ProcessingContext parse(URI uri, String contents, Pair<String, String>... args) {
     val obj = new AireJavaFileObject(uri, contents);
-    return parse(new PrintWriter(System.out), Collections.singletonList(obj));
+    return parse(new PrintWriter(System.out), Collections.singletonList(obj), args);
   }
 }

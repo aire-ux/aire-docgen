@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
@@ -41,14 +40,12 @@ public class DocumentationParser
   private final DocletEnvironment environment;
   private final Map<Element, Boolean> visited;
   private final Map<ElementKind, Parser> parserCache;
-  private final Stack<SyntaxNode<DocTree, Element>> nodes;
 
   public DocumentationParser(DocTrees docTrees, DocletEnvironment environment, Reporter reporter) {
     this.reporter = reporter;
     this.environment = environment;
     this.documentForest = docTrees;
 
-    this.nodes = new Stack<>();
     this.visited = new SwissTable<>();
     this.parserCache = new HashMap<>();
   }
@@ -59,7 +56,7 @@ public class DocumentationParser
     log.info("Successfully registered parser");
   }
 
-  public AbstractSyntaxTree process(Set<? extends Element> elements) {
+  public AbstractSyntaxTree<DocTree, Element> process(Set<? extends Element> elements) {
     val result = new AbstractSyntaxTree<DocTree, Element>();
     scan(elements, result.getRoot());
     return result;
@@ -99,8 +96,8 @@ public class DocumentationParser
 
   final class TagVisitor extends SimpleDocTreeVisitor<SyntaxNode<DocTree, Element>, Void> {
 
-    final SyntaxNode node;
     final Element element;
+    final SyntaxNode<DocTree, Element> node;
 
     TagVisitor(@Nonnull final SyntaxNode<DocTree, Element> node, @Nonnull Element element) {
       this.node = node;

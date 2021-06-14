@@ -9,6 +9,7 @@ import com.aire.ux.docgen.parsers.ComponentElementParser;
 import com.aire.ux.docgen.parsers.PropertyParser;
 import com.aire.ux.parsers.ast.NamedSyntaxNode;
 import com.aire.ux.parsers.ast.SyntaxNode;
+import io.sunshower.lang.tuple.Pair;
 import java.net.URI;
 import java.util.NoSuchElementException;
 import lombok.val;
@@ -16,9 +17,10 @@ import org.junit.jupiter.api.Test;
 
 public class AireDocletTest {
 
+  @SuppressWarnings("unchecked")
   static ProcessingContext parse(String componentName, String contents) {
     val uri = URI.create(format("mem://java/%s.java", componentName));
-    return AireDocumentationManager.parse(uri, contents);
+    return AireDocumentationManager.parse(uri, contents, Pair.of("-d", DocletTests.testOutput()));
   }
 
   @Test
@@ -177,6 +179,7 @@ public class AireDocletTest {
             + "*    public void doStuff();\n"
             + "* </code>\n"
             + "*/\n"
+            + "package test;\n"
             + "public class Component {\n"
             + "\n"
             + "  /**\n"
@@ -196,6 +199,66 @@ public class AireDocletTest {
             .findFirst(e -> e.getSymbol() == PropertyParser.PropertySymbol)
             .orElseThrow(() -> new NoSuchElementException("not here"));
     assertTrue(field.getContent().contains("awesome property"));
+  }
+
+  @Test
+  void ensureGroupComponentWorks() {
+    val test =
+        "/**\n"
+            + "* @group whatever\n"
+            + "* @component\n"
+            + "* <code lang=\"groovy\">\n"
+            + "*    public void doStuff();\n"
+            + "* </code>\n"
+            + "*/\n"
+            + "public class Component {\n"
+            + "\n"
+            + "  /**\n"
+            + "  * @property\n"
+            + "  *\n"
+            + "  * this is an awesome property\n"
+            + "  * don't you think?\n"
+            + "  *\n"
+            + "  *\n"
+            + "  */\n"
+            + "  private String field;\n"
+            + "\n"
+            + "  /**\n"
+            + "  * @group test\n"
+            + "  * @component\n"
+            + "  * hello world\n"
+            + "  * <code lang=\"java\">\n"
+            + "  *  public void doStuff();\n"
+            + "  * </code>\n"
+            + "  */\n"
+            + "  class A {\n"
+            + "  }\n"
+            + "  /**\n"
+            + "  * @component\n"
+            + "  * hello world\n"
+            + "  * <code lang=\"java\">\n"
+            + "  *  public void doStuff1();\n"
+            + "  * </code>\n"
+            + "  */\n"
+            + "  class B {\n"
+            + "    /**\n"
+            + "    * @group coolio\n"
+            + "    * @component\n"
+            + "    * hello world\n"
+            + "    * <code lang=\"java\">\n"
+            + "    *  public void doStuff2();\n"
+            + "    * </code>\n"
+            + "    */\n"
+            + "    class A {\n"
+            + "      /**\n"
+            + "      * @property\n"
+            + "      */\n"
+            + "      private int sup;\n"
+            + "    }\n"
+            + "  }\n"
+            + "}\n";
+    val result = parse("Component", test);
+    System.out.println(result.getSyntaxTree());
   }
 
   @Test
