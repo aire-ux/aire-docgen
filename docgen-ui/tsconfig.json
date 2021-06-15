@@ -11,10 +11,11 @@
     "target": "es2017",
     "moduleResolution": "node",
     "strict": true,
+    "strictPropertyInitialization": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
-    "noImplicitAny": true,
-    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "experimentalDecorators": true,
@@ -28,6 +29,7 @@
   "include": [
     "frontend/**/*.ts",
     "frontend/index.js",
+    "src/main/application/**/*.ts",
     "types.d.ts"
   ],
   "exclude": []

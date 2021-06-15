@@ -1,0 +1,42 @@
+components:
+- component-name: TestClass2
+  package: airedocs
+  examples:
+  - lang: groovy
+    value: "\n   def myComponent = new TestClass2();\n   add(myComponent)\n "
+  - lang: java
+    value: "\n   var myComponent = new TestClass2();\n   add(myComponent)\n "
+  description: "*This is a pretty cool component*\n\n 1. markdown list element 1\n\
+    \ 1. md 2\n\n \n "
+  properties:
+  - name: attribute1
+    description: "this is a pretty cool property\n \n "
+    type: java.lang.String
+    examples:
+    - lang: groovy
+      value: "\n   def myComponent = new TestClass2();\n   add(myComponent)\n "
+    - lang: java
+      value: "\n   var myComponent = new TestClass2();\n   add(myComponent)\n "
+  group: TestClass2
+- component-name: TestClass2.InnerComponent
+  package: airedocs
+  examples:
+  - lang: groovy
+    value: "\n   def myComponent = new TestClass2();\n   add(myComponent)\n "
+  - lang: java
+    value: "\n   var myComponent = new TestClass2();\n   add(myComponent)\n "
+  description: "this is a pretty cool component, don't you think so?\n \n \n\n Idk\
+    \ what else to do with this"
+  properties:
+  - name: parent
+    description: "\n \n "
+    type: airedocs.TestClass2
+    examples:
+    - lang: groovy
+      value: "\n   def myComponent = new TestClass2();\n   add(myComponent)\n "
+    - lang: java
+      value: "\n   var myComponent = new TestClass2();\n   add(myComponent)\n "
+    - lang: clojure
+      value: "\n   (doto (airedocs.TestComponent.)\n      (.add (aire.Button \"hello\"\
+        )))\n "
+  group: InnerComponent

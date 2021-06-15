@@ -1,0 +1,22 @@
+::slotted(header) {
+  height: 64px;
+  border-bottom: 1px solid var(--lumo-contrast-20pct);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+::slotted(nav) {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: var(--lumo-primary-contrast-color);
+  overflow-x: hidden;
+  padding-top: 60px;
+  transition: 0.5s;
+}

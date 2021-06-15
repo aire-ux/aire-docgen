@@ -26,8 +26,9 @@ class YamlEmitterTest {
   @SuppressWarnings("unchecked")
   void ensureWritingCompleteComponentWorks() {
     val fileObjects = DocletTests.hierarchyIn("resources/test/airedocs");
-    AireDocumentationManager.parse(fileObjects, Pair.of("-d", DocletTests.testOutput() + "/docs"),
+    val result = AireDocumentationManager.parse(fileObjects, Pair.of("-d", DocletTests.testOutput() + "/docs"),
         Pair.of("--format", "yaml"));
+    System.out.println(result.getSyntaxTree());
 
   }
 
