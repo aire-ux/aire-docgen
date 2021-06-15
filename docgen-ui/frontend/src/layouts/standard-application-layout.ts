@@ -1,36 +1,63 @@
-import {customElement, html, LitElement, PropertyValues, query} from "lit-element";
+import {customElement, html, LitElement, property, PropertyValues, query} from "lit-element";
 
 import styles from 'styles/standard-application-layout.css'
 
 export type SlotChangedEvent = {}
 
+export enum NavigationState {
+  Open = "Open",
+  Closed = "Closed"
+}
+
 @customElement('standard-application-layout')
 export default class StandardApplicationLayout extends LitElement {
+
+  public static NAVIGATION_STATE_CHANGED_EVENT = 'navigation-state-changed';
 
 
   /**
    *
    */
   @query('slot[name="header"]')
-  header: HTMLSlotElement;
+  public header: HTMLSlotElement;
 
   @query('slot[name="navigation"]')
-  navigation: HTMLSlotElement;
+  public navigation: HTMLSlotElement;
+
+  /**
+   * the width of the navigation when it's in its open state
+   */
+
+  @property({type: String})
+  public width: string;
+
+  /**
+   * the navigation state (open or closed)
+   */
+  @property({type: NavigationState})
+  public navigationState: NavigationState
 
 
   /**
    * the actual navigation element
    */
-  navigationElement: HTMLElement;
+  private _navigationElement: HTMLElement;
+
 
   /**
-   * update the navigation element from a slot changed event
-   * @param event the slot changed event (unused by this by default)
+   * get the navigation element
    */
-  private updateNavigationElement = (event: SlotChangedEvent) =>
-      this.navigationElement = this.navigation.assignedElements()[0] as HTMLElement;
+  public get navigationElement(): HTMLElement {
+    if (this._navigationElement) {
+      return this._navigationElement;
+    }
+    return (this._navigationElement = this.navigation.assignedElements()[0] as HTMLElement);
+  }
 
 
+  /**
+   * style definitions
+   */
   static styles = [
     styles,
   ]
@@ -46,19 +73,26 @@ export default class StandardApplicationLayout extends LitElement {
     `;
   }
 
+  public openNavigation(): void {
+    this.changeNavigationState(NavigationState.Open, this.width);
+  }
 
-  protected firstUpdated(changed: PropertyValues) {
-    super.firstUpdated(changed);
-    this.navigation.addEventListener('slotchange', this.updateNavigationElement);
+  public closeNavigation(): void {
+    this.changeNavigationState(NavigationState.Closed, "0px");
   }
 
 
-  private openNav(): void {
-    this.navigationElement.style.width = '250px';
-
-    // let child = this.header.children[0] as HTMLElement;
-    // console.log(child);
-    // child.style.width = '250px';
+  public changeNavigationState(newState: NavigationState, width: string) : void {
+    this.navigationState = newState;
+    this.navigationElement.style.width = width;
+    this.dispatchEvent(
+        new CustomEvent(
+            StandardApplicationLayout.NAVIGATION_STATE_CHANGED_EVENT, {
+              detail: {
+                state: this.navigationState
+              }
+            }));
   }
+
 
 }
