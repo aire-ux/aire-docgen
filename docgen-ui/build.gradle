@@ -47,6 +47,12 @@ dependencies {
     aireDocs 'org.apache.logging.log4j:log4j-core:2.14.1'
     aireDocs group: 'io.timeandspace', name: 'smoothie-map', version: '2.0.2'
 
+    implementation 'javax.inject:javax.inject:1'
+
+
+    testImplementation 'com.aire-ux.components:aire-test-spring'
+    testImplementation 'com.aire-ux.components:aire-test-vaadin'
+
     implementation('com.vaadin:vaadin-spring-boot-starter') {
         [
                 "com.vaadin.webjar",

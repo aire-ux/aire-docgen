@@ -135,6 +135,7 @@ public class StandardApplicationLayout extends HtmlContainer {
    */
   public void openNavigation() {
     getElement().executeJs("this.openNavigation()");
+    fireEvent(new NavigationStateChangeEvent(this, false, "closed"));
   }
 
   /**
@@ -142,6 +143,7 @@ public class StandardApplicationLayout extends HtmlContainer {
    */
   public void closeNavigation() {
     getElement().executeJs("this.closeNavigation()");
+    fireEvent(new NavigationStateChangeEvent(this, false, "open"));
   }
 
 
@@ -204,7 +206,6 @@ public class StandardApplicationLayout extends HtmlContainer {
   /**
    *
    */
-  @DomEvent(value = "navigation-state-changed")
   public static class NavigationStateChangeEvent extends ComponentEvent<Component> {
 
     @Getter
@@ -213,7 +214,7 @@ public class StandardApplicationLayout extends HtmlContainer {
     public NavigationStateChangeEvent(
         Component source,
         boolean fromClient,
-        @EventData("element.navigationState") String state
+        String state
     ) {
       super(source, fromClient);
       this.state = NavigationState.from(state);

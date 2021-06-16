@@ -2,7 +2,6 @@ import {customElement, html, LitElement, property, PropertyValues, query} from "
 
 import styles from 'styles/standard-application-layout.css'
 
-export type SlotChangedEvent = {}
 
 export enum NavigationState {
   Open = "Open",
@@ -51,7 +50,10 @@ export default class StandardApplicationLayout extends LitElement {
     if (this._navigationElement) {
       return this._navigationElement;
     }
-    return (this._navigationElement = this.navigation.assignedElements()[0] as HTMLElement);
+    let navigation = this.navigation,
+        assignedElements = navigation.assignedElements() ,
+        assignedElement = assignedElements.length && assignedElements[0];
+    return (this._navigationElement = assignedElement as HTMLElement);
   }
 
 
